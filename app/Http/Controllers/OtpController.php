@@ -1,0 +1,88 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+
+class OtpController extends Controller
+{
+  // Generate OTP
+  public function sendOtp(Request $request)
+  {
+    $request->validate([
+      'phone' => 'required|string'
+    ]);
+
+    // Generate random 6-digit OTP
+    $otp = rand(100000, 999999);
+
+    // Expire time = 1 minute from now
+    $expiresAt = Carbon::now()->addMinute();
+
+    // Save or update OTP record
+    try {
+      DB::table('otps')->updateOrInsert(
+        ['phone' => $request->phone],
+        [
+          'otp_code' => $otp,
+          'expires_at' => $expiresAt,
+          'updated_at' => now(),
+          'created_at' => now(),
+        ]
+      );
+    } catch (\Exception $e) {
+      return response()->json([
+        'status' => false,
+        'message' => 'Failed to store OTP',
+        'error' => $e->getMessage()
+      ], 500);
+    }
+
+    // For now, return OTP in JSON (Flutter will show it using local notification)
+    return response()->json([
+      'status' => true,
+      'message' => 'OTP generated successfully',
+      'otp_code' => $otp, // In real app, don’t send it to the user directly
+      'expires_in' => '1 minute',
+    ]);
+  }
+
+  // Verify OTP
+  public function verifyOtp(Request $request)
+  {
+    $request->validate([
+      'phone' => 'required|string',
+      'otp' => 'required|string'
+    ]);
+
+    $otpData = DB::table('otps')->where('phone', $request->phone)->first();
+
+    if (!$otpData) {
+      return response()->json(['status' => false, 'message' => 'No OTP found'], 400);
+    }
+
+    // Check if expired
+    if (Carbon::now()->greaterThan($otpData->expires_at)) {
+      DB::table('otps')->where('phone', $request->phone)->delete();
+      return response()->json(['status' => false, 'message' => 'OTP expired'], 400);
+    }
+
+    // Check code
+    if ($otpData->otp_code != $request->otp) {
+      return response()->json(['status' => false, 'message' => 'Invalid OTP'], 400);
+    }
+
+    // OTP verified — now delete OTP record
+    DB::table('otps')->where('phone', $request->phone)->delete();
+
+    return response()->json(['status' => true, 'message' => 'OTP verified successfully']);
+  }
+
+  // Resend OTP (generate new one)
+  public function resendOtp(Request $request)
+  {
+    return $this->sendOtp($request);
+  }
+}
