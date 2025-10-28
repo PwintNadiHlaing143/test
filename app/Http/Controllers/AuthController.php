@@ -247,4 +247,32 @@ class AuthController extends Controller
       ]
     ], 200);
   }
+
+  public function logout(Request $request)
+  {
+    try {
+      $user = $request->user();
+
+      if (!$user) {
+        return response()->json([
+          'success' => false,
+          'message' => 'User not authenticated'
+        ], 401);
+      }
+
+      // Current token ကို revoke လုပ်ခြင်း
+      $request->user()->token()->revoke();
+
+      return response()->json([
+        'success' => true,
+        'message' => 'Logout successful'
+      ], 200);
+    } catch (\Exception $e) {
+      return response()->json([
+        'success' => false,
+        'message' => 'Logout failed',
+        'error' => $e->getMessage()
+      ], 500);
+    }
+  }
 }
