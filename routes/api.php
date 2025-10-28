@@ -38,22 +38,20 @@ Route::post('/supervisor/login', [SupervisorController::class, 'login']);
 
 
 
-
-// Owner login
+// Owner authentication routes
 Route::post('/owner/login', [OwnerAuthController::class, 'login']);
 
-Route::middleware('auth:owner-api')->post('/supervisor/register', [SupervisorController::class, 'store']);
-
-
-// Owner protected routes
+// Protected owner routes - use owner-api guard
 Route::middleware('auth:owner-api')->group(function () {
-
+  Route::post('/supervisors', [SupervisorController::class, 'store']);
   Route::post('/owner/logout', [OwnerAuthController::class, 'logout']);
 });
-// Protected supervisor routes (supervisor must use their token)
+
+// Supervisor authentication routes  
+Route::post('/supervisor/login', [SupervisorController::class, 'login']);
+
+// Protected supervisor routes
 Route::middleware('auth:supervisor-api')->group(function () {
   Route::post('/supervisor/logout', [SupervisorController::class, 'logout']);
-  Route::get('/supervisors', [SupervisorController::class, 'index']);
-  Route::put('/supervisor/{id}', [SupervisorController::class, 'update']);
-  Route::delete('/supervisor/{id}', [SupervisorController::class, 'destroy']);
+  Route::get('/supervisor/profile', [SupervisorController::class, 'profile']);
 });

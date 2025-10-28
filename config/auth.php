@@ -1,24 +1,20 @@
 <?php
 
 return [
-
-
-
   'defaults' => [
-    'guard' => 'web',
-    'passwords' => 'users',
+    'guard' => 'api', // ✅ Change from 'web' to 'api'
+    'passwords' => 'owners', // ✅ Change to 'owners' (or keep 'users' if you prefer)
   ],
-
-
 
   'guards' => [
     'web' => [
       'driver' => 'session',
       'provider' => 'users',
     ],
+
     'api' => [
       'driver' => 'passport',
-      'provider' => 'users',
+      'provider' => 'owners', // ✅ Change from 'users' to 'owners'
     ],
 
     //for supervisor
@@ -26,14 +22,13 @@ return [
       'driver' => 'passport',
       'provider' => 'supervisors',
     ],
-    //for supervisor
+
+    //for owner
     'owner-api' => [
       'driver' => 'passport',
       'provider' => 'owners',
     ],
   ],
-
-
 
   'providers' => [
     'users' => [
@@ -45,14 +40,12 @@ return [
       'driver' => 'eloquent',
       'model' => App\Models\Owner::class,
     ],
+
     'supervisors' => [
       'driver' => 'eloquent',
       'model' => App\Models\Supervisor::class,
     ],
-
   ],
-
-
 
   'passwords' => [
     'users' => [
@@ -61,10 +54,22 @@ return [
       'expire' => 60,
       'throttle' => 60,
     ],
+
+    // ✅ ADD these password reset configs
+    'owners' => [
+      'provider' => 'owners',
+      'table' => 'password_reset_tokens',
+      'expire' => 60,
+      'throttle' => 60,
+    ],
+
+    'supervisors' => [
+      'provider' => 'supervisors',
+      'table' => 'password_reset_tokens',
+      'expire' => 60,
+      'throttle' => 60,
+    ],
   ],
 
-
-
   'password_timeout' => 10800,
-
 ];

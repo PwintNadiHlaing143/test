@@ -6,12 +6,11 @@ use App\Models\Supervisor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class SupervisorController extends Controller
 {
-  /**
-   * Owner creates a new supervisor account.
-   */
+
   public function store(Request $request)
   {
     $request->validate([
@@ -21,9 +20,8 @@ class SupervisorController extends Controller
       'supervisor_password' => 'required|string|min:6|confirmed',
     ]);
 
-    // Use default API guard (simpler)
-    $owner = Auth::user(); // This uses the default API guard
-    $ownerId = $owner ? $owner->owner_id : null; // Use owner_id instead of id
+    $owner = Auth::user();
+    $ownerId = $owner ? $owner->owner_id : null;
 
     if (!$ownerId) {
       return response()->json([
@@ -48,5 +46,81 @@ class SupervisorController extends Controller
       'message' => 'Supervisor account created successfully',
       'data' => $supervisor,
     ], 201);
+  }
+
+  /**
+   * Supervisor Login
+   */
+  public function login(Request $request)
+  {
+    $validator = Validator::make($request->all(), [
+      'supervisor_phone' => 'required|string',
+      'supervisor_password' => 'required|string',
+    ]);
+
+    if ($validator->fails()) {
+      return response()->json([
+        'message' => 'Validation failed',
+        'errors' => $validator->errors()
+      ], 422);
+    }
+
+
+    $supervisor = Supervisor::where('supervisor_phone', $request->supervisor_phone)
+      ->where('supervisor_status', true)
+      ->first();
+
+
+    if (!$supervisor || !Hash::check($request->supervisor_password, $supervisor->supervisor_password)) {
+      return response()->json([
+        'message' => 'Invalid credentials or account inactive'
+      ], 401);
+    }
+
+
+    $token = $supervisor->createToken('SupervisorToken')->accessToken;
+
+    return response()->json([
+      'message' => 'Login successful',
+      'access_token' => $token,
+      'token_type' => 'Bearer',
+      'supervisor' => [
+        'supervisor_id' => $supervisor->supervisor_id,
+        'supervisor_name' => $supervisor->supervisor_name,
+        'supervisor_phone' => $supervisor->supervisor_phone,
+        'supervisor_address' => $supervisor->supervisor_address,
+        'owner_id' => $supervisor->owner_id,
+      ]
+    ]);
+  }
+
+  /**
+   * Supervisor Logout
+   */
+  public function logout(Request $request)
+  {
+
+    $request->user()->token()->revoke();
+
+    return response()->json([
+      'message' => 'Successfully logged out'
+    ]);
+  }
+
+  public function profile(Request $request)
+  {
+    $supervisor = Auth::guard('supervisor-api')->user();
+
+    return response()->json([
+      'supervisor' => [
+        'supervisor_id' => $supervisor->supervisor_id,
+        'supervisor_name' => $supervisor->supervisor_name,
+        'supervisor_phone' => $supervisor->supervisor_phone,
+        'supervisor_address' => $supervisor->supervisor_address,
+        'supervisor_status' => $supervisor->supervisor_status,
+        'owner_id' => $supervisor->owner_id,
+        'created_at' => $supervisor->created_at,
+      ]
+    ]);
   }
 }

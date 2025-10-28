@@ -11,10 +11,9 @@ class Owner extends Authenticatable
 {
   use HasApiTokens, HasFactory, Notifiable;
 
-  protected $table = 'owner'; // table name, default Laravel will pluralize
+  protected $table = 'owner';
 
-  protected $primaryKey = 'owner_id'; // if you use custom primary key
-
+  protected $primaryKey = 'owner_id';
   protected $fillable = [
     'owner_name',
     'owner_phone',
