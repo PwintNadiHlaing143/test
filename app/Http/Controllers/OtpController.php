@@ -15,10 +15,10 @@ class OtpController extends Controller
       'phone' => 'required|string'
     ]);
 
-    // Generate random 6-digit OTP
+    // Generate random 
     $otp = rand(100000, 999999);
 
-    // Expire time = 1 minute from now
+    // Expire time 1 minute
     $expiresAt = Carbon::now()->addMinute();
 
     // Save or update OTP record
@@ -40,11 +40,11 @@ class OtpController extends Controller
       ], 500);
     }
 
-    // For now, return OTP in JSON (Flutter will show it using local notification)
+
     return response()->json([
       'status' => true,
       'message' => 'OTP generated successfully',
-      'otp_code' => $otp, // In real app, don’t send it to the user directly
+      'otp_code' => $otp,
       'expires_in' => '1 minute',
     ]);
   }
@@ -74,13 +74,13 @@ class OtpController extends Controller
       return response()->json(['status' => false, 'message' => 'Invalid OTP'], 400);
     }
 
-    // OTP verified — now delete OTP record
+    // OTP verified 
     DB::table('otps')->where('phone', $request->phone)->delete();
 
     return response()->json(['status' => true, 'message' => 'OTP verified successfully']);
   }
 
-  // Resend OTP (generate new one)
+  // Resend OTP 
   public function resendOtp(Request $request)
   {
     return $this->sendOtp($request);

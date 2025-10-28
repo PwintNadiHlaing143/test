@@ -2,24 +2,42 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Passport\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
 
-class User extends Model
+class User extends Authenticatable
 {
-  protected $table = 'users'; // table name
-  protected $primaryKey = 'id'; // primary key
+  use HasApiTokens, HasFactory, Notifiable;
 
-  // fillable fields (optional)
+  protected $primaryKey = 'user_id';
+
   protected $fillable = [
-    'name',
-    'email',
-    'password',
+    'user_name',
+    'phone_number',
+    'user_password',
+    'user_address',
     'township_id',
+    'current_bottles',
+    'change_return',
+    'empty_collected'
   ];
+
+  protected $hidden = [
+    'user_password',
+    'remember_token',
+  ];
+
+  // Custom password field for authentication
+  public function getAuthPassword()
+  {
+    return $this->user_password;
+  }
 
   // Township relationship
   public function township()
   {
-    return $this->belongsTo(Township::class, 'township_id', 'township_id');
+    return $this->belongsTo(Township::class, 'township_id', 'id');
   }
 }
