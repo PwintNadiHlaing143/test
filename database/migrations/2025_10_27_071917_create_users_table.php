@@ -18,7 +18,7 @@ return new class extends Migration
       $table->decimal('change_return', 10, 2)->default(0.0);
       $table->integer('empty_collected')->default(0);
 
-      // ✅ foreign key
+
       $table->unsignedBigInteger('township_id');
 
       $table->foreign('township_id')

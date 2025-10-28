@@ -22,7 +22,7 @@ class AppServiceProvider extends ServiceProvider
   {
 
 
-    // Laravel 10 အတွက် Passport routes setup
+
     Passport::tokensExpireIn(now()->addDays(15));
     Passport::refreshTokensExpireIn(now()->addDays(30));
   }

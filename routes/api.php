@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\TownshipController;
+
 use App\Http\Controllers\OtpController;
 
 
@@ -22,3 +24,11 @@ Route::middleware('auth:api')->group(function () {
 Route::post('/send-otp', [OtpController::class, 'sendOtp']);
 Route::post('/verify-otp', [OtpController::class, 'verifyOtp']);
 Route::post('/resend-otp', [OtpController::class, 'resendOtp']);
+
+
+
+
+// Public routes (no auth required)
+Route::get('/townships', [TownshipController::class, 'index']);
+Route::get('/townships/{id}', [TownshipController::class, 'show']);
+Route::get('/townships/search/{name}', [TownshipController::class, 'search']);
