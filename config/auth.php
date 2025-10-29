@@ -28,6 +28,12 @@ return [
       'driver' => 'passport',
       'provider' => 'owners',
     ],
+
+
+    'deliveryStaff-api' => [
+      'driver' => 'passport',
+      'provider' => 'deliveryStaffs',
+    ],
   ],
 
   'providers' => [
@@ -44,6 +50,10 @@ return [
     'supervisors' => [
       'driver' => 'eloquent',
       'model' => App\Models\Supervisor::class,
+    ],
+    'deliveryStaffs' => [
+      'driver' => 'eloquent',
+      'model' => App\Models\DeliveryStaff::class,
     ],
   ],
 

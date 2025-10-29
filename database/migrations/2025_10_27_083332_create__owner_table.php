@@ -16,6 +16,7 @@ return new class extends Migration
       $table->string('owner_name', 100);
       $table->string('owner_phone', 15);
       $table->string('owner_password', 100);
+      $table->timestamps();
     });
   }
 
