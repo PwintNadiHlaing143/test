@@ -12,9 +12,9 @@ return [
       'provider' => 'users',
     ],
 
-    'api' => [
+    'user-api' => [
       'driver' => 'passport',
-      'provider' => 'owners', // ✅ Change from 'users' to 'owners'
+      'provider' => 'users', // ✅ Change from 'users' to 'owners'
     ],
 
     //for supervisor

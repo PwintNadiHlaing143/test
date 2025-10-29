@@ -9,7 +9,7 @@ class TownshipSeeder extends Seeder
 {
   public function run(): void
   {
-    // 10 record fake data generate
+    // Generate 10 fake township
     Township::factory()->count(10)->create();
   }
 }

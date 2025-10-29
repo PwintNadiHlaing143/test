@@ -11,11 +11,7 @@ use Illuminate\Support\Facades\Auth;
 
 class DeliveryStaffAuthController extends Controller
 {
-  // ... your existing login, logout, profile methods ...
 
-  /**
-   * Register new delivery staff (Supervisor only) - ADD THIS METHOD
-   */
   public function registerBySupervisor(Request $request)
   {
     $supervisor = $request->user('supervisor-api');
@@ -61,9 +57,7 @@ class DeliveryStaffAuthController extends Controller
   }
 
 
-  /**
-   * Staff login
-   */
+  //staff login
   public function login(Request $request)
   {
     $validator = Validator::make($request->all(), [
@@ -82,10 +76,10 @@ class DeliveryStaffAuthController extends Controller
       return response()->json(['error' => 'Invalid phone or password'], 401);
     }
 
-    // ✅ Use the correct guard ('deliveryStaff-api')
+
     Auth::shouldUse('deliveryStaff-api');
 
-    // Create Passport token for delivery staff
+
     $token = $staff->createToken('DeliveryStaffToken')->accessToken;
 
     return response()->json([
@@ -94,10 +88,7 @@ class DeliveryStaffAuthController extends Controller
       'token' => $token
     ], 200);
   }
-
-  /**
-   * Logout delivery staff
-   */
+  //for logout staff
   public function logout(Request $request)
   {
     $user = Auth::guard('deliveryStaff-api')->user();
@@ -109,9 +100,7 @@ class DeliveryStaffAuthController extends Controller
     return response()->json(['message' => 'Logout successful']);
   }
 
-  /**
-   * Get logged-in staff profile
-   */
+  //for see profile
   public function profile(Request $request)
   {
     $user = Auth::guard('deliveryStaff-api')->user();

@@ -22,6 +22,8 @@ return new class extends Migration
         ->on('supervisors') // Changed from 'supervisor' to 'supervisors'
         ->onDelete('cascade')
         ->onUpdate('cascade');
+
+      $table->timestamps();
     });
   }
 

@@ -48,9 +48,7 @@ class SupervisorController extends Controller
     ], 201);
   }
 
-  /**
-   * Supervisor Login
-   */
+  //supervisor login
   public function login(Request $request)
   {
     $validator = Validator::make($request->all(), [
@@ -93,10 +91,7 @@ class SupervisorController extends Controller
       ]
     ]);
   }
-
-  /**
-   * Supervisor Logout
-   */
+  //supervisor logout
   public function logout(Request $request)
   {
 
@@ -106,7 +101,7 @@ class SupervisorController extends Controller
       'message' => 'Successfully logged out'
     ]);
   }
-
+  //supervisor profile
   public function profile(Request $request)
   {
     $supervisor = Auth::guard('supervisor-api')->user();
