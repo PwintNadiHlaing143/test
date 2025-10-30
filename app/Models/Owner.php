@@ -24,9 +24,6 @@ class Owner extends Authenticatable
     'remember_token',
   ];
 
-  /**
-   * Relationship: Owner has many Supervisors
-   */
   public function supervisors()
   {
     return $this->hasMany(Supervisor::class, 'owner_id', 'owner_id');

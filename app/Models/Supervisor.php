@@ -31,13 +31,12 @@ class Supervisor extends Authenticatable
     'remember_token',
   ];
 
-  // 👇 Tell Laravel what your password column is called
+
   public function getAuthPassword()
   {
     return $this->supervisor_password;
   }
 
-  // 👇 Each supervisor belongs to one owner
   public function owner()
   {
     return $this->belongsTo(Owner::class, 'owner_id');

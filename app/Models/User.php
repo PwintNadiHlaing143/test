@@ -29,13 +29,11 @@ class User extends Authenticatable
     'remember_token',
   ];
 
-  // Custom password field for authentication
+
   public function getAuthPassword()
   {
     return $this->user_password;
   }
-
-  // Township relationship
   public function township()
   {
     return $this->belongsTo(Township::class, 'township_id', 'id');

@@ -16,7 +16,8 @@ Route::post('/user/register', [AuthController::class, 'register']);
 Route::post('/user/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:user-api')->prefix('user')->group(function () {
-  Route::get('/profile', [AuthController::class, 'profile']);
+  Route::get('/profile', [AuthController::class, 'user']);
+  Route::put('/update-profile', [AuthController::class, 'updateProfile']); // ✅ new route
   Route::post('/logout', [AuthController::class, 'logout']);
   Route::delete('/delete-account', [AuthController::class, 'deleteAccount']);
   Route::post('/refresh-token', [AuthController::class, 'refreshTokenSimple']);

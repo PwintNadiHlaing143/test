@@ -29,25 +29,16 @@ class DeliveryStaff extends Authenticatable
     'remember_token',
   ];
 
-  /**
-   * Get the password for the user.
-   */
   public function getAuthPassword()
   {
     return $this->staff_password;
   }
 
-  /**
-   * Relationship: Delivery staff belongs to a delivery group
-   */
   public function deliveryGroup()
   {
     return $this->belongsTo(DeliveryGroup::class, 'group_id', 'group_id');
   }
 
-  /**
-   * Relationship: Delivery staff belongs to a supervisor through delivery group
-   */
   public function supervisor()
   {
     return $this->hasOneThrough(

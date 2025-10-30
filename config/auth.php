@@ -2,8 +2,8 @@
 
 return [
   'defaults' => [
-    'guard' => 'api', // ✅ Change from 'web' to 'api'
-    'passwords' => 'owners', // ✅ Change to 'owners' (or keep 'users' if you prefer)
+    'guard' => 'owner-api',
+    'passwords' => 'owners',
   ],
 
   'guards' => [
@@ -14,7 +14,7 @@ return [
 
     'user-api' => [
       'driver' => 'passport',
-      'provider' => 'users', // ✅ Change from 'users' to 'owners'
+      'provider' => 'users',
     ],
 
     //for supervisor

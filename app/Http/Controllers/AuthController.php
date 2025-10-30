@@ -260,7 +260,7 @@ class AuthController extends Controller
         ], 401);
       }
 
-      // Current token ကို revoke လုပ်ခြင်း
+
       $request->user()->token()->revoke();
 
       return response()->json([
@@ -271,6 +271,71 @@ class AuthController extends Controller
       return response()->json([
         'success' => false,
         'message' => 'Logout failed',
+        'error' => $e->getMessage()
+      ], 500);
+    }
+  }
+
+
+  public function updateProfile(Request $request)
+  {
+    try {
+      $user = $request->user(); // get authenticated user
+
+      if (!$user) {
+        return response()->json([
+          'success' => false,
+          'message' => 'User not authenticated'
+        ], 401);
+      }
+
+      $validator = Validator::make($request->all(), [
+        'user_name' => 'sometimes|required|string|max:100',
+        'user_address' => 'sometimes|required|string',
+        'township_id' => 'sometimes|required|exists:townships,id',
+        'user_password' => 'nullable|string|min:6|confirmed'
+      ]);
+
+      if ($validator->fails()) {
+        return response()->json([
+          'success' => false,
+          'message' => 'Validation error',
+          'errors' => $validator->errors()
+        ], 422);
+      }
+
+      // Update basic info
+      if ($request->filled('user_name')) {
+        $user->user_name = $request->user_name;
+      }
+      if ($request->filled('user_address')) {
+        $user->user_address = $request->user_address;
+      }
+      if ($request->filled('township_id')) {
+        $user->township_id = $request->township_id;
+      }
+
+      // Update password if provided
+      if ($request->filled('user_password')) {
+        $user->user_password = Hash::make($request->user_password);
+      }
+
+      $user->save();
+
+      // Load township relationship
+      $user->load('township');
+
+      return response()->json([
+        'success' => true,
+        'message' => 'Profile updated successfully',
+        'data' => [
+          'user' => $user
+        ]
+      ], 200);
+    } catch (\Exception $e) {
+      return response()->json([
+        'success' => false,
+        'message' => 'Profile update failed',
         'error' => $e->getMessage()
       ], 500);
     }
