@@ -9,14 +9,14 @@ class Township extends Model
 {
   use HasFactory;
   protected $table = 'townships';
-  protected $primaryKey = 'id';
+  protected $primaryKey = 'township_id';
 
 
-  protected $fillable = ['name'];
+  protected $fillable = ['township_name'];
 
 
   public function users()
   {
-    return $this->hasMany(User::class, 'township_id', 'id');
+    return $this->hasMany(User::class, 'township_id', 'township_id');
   }
 }

@@ -19,15 +19,11 @@ return new class extends Migration
       $table->integer('order_quantity');
       $table->decimal('total_amount', 10, 2);
       $table->dateTime('order_date')->useCurrent();
-
-      // String နဲ့သုံးမယ်
       $table->string('order_status', 50)->default('pending');
-
       $table->decimal('sold_price', 10, 2)->nullable();
       $table->decimal('cash_collected', 10, 2)->default(0);
       $table->decimal('change_returned', 10, 2)->default(0);
       $table->integer('empty_collected')->default(0);
-
       $table->text('notes')->nullable();
       $table->timestamps();
 

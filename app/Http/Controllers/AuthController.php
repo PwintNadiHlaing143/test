@@ -19,7 +19,7 @@ class AuthController extends Controller
       'phone_number' => 'required|string|max:15|unique:users,phone_number',
       'user_password' => 'required|string|min:6|confirmed',
       'user_address' => 'required|string',
-      'township_id' => 'required|exists:townships,id',
+      'township_id' => 'required|exists:townships,township_id',
     ]);
 
     if ($validator->fails()) {
@@ -55,7 +55,7 @@ class AuthController extends Controller
         'access_token' => $token,
         'token_type' => 'Bearer',
         'expires_at' => Carbon::parse($tokenInstance->expires_at)->toDateTimeString(),
-        'refresh_token' => $this->generateRefreshToken($user) // Add refresh token
+        'refresh_token' => $this->generateRefreshToken($user)
       ]
     ], 201);
   }
@@ -124,10 +124,10 @@ class AuthController extends Controller
       }
 
       // Find valid refresh token
-      $token = Token::where('id', $request->refresh_token)
+      $token = Token::where('township_id', $request->refresh_token)
         ->where('revoked', false)
         ->where('expires_at', '>', Carbon::now())
-        ->where('name', 'Refresh Token')
+        ->where('township_name', 'Refresh Token')
         ->first();
 
       if (!$token) {
@@ -217,13 +217,8 @@ class AuthController extends Controller
           'message' => 'Invalid password'
         ], 401);
       }
-
-
       $user->tokens()->delete();
-
-
       $user->delete();
-
       return response()->json([
         'success' => true,
         'message' => 'Account deleted successfully'
@@ -252,7 +247,6 @@ class AuthController extends Controller
   {
     try {
       $user = $request->user();
-
       if (!$user) {
         return response()->json([
           'success' => false,
@@ -276,68 +270,98 @@ class AuthController extends Controller
     }
   }
 
-
-  public function updateProfile(Request $request)
+  public function updateName(Request $request)
   {
-    try {
-      $user = $request->user(); // get authenticated user
+    $user = $request->user();
 
-      if (!$user) {
-        return response()->json([
-          'success' => false,
-          'message' => 'User not authenticated'
-        ], 401);
-      }
+    $request->validate([
+      'user_name' => 'required|string|max:100'
+    ]);
 
-      $validator = Validator::make($request->all(), [
-        'user_name' => 'sometimes|required|string|max:100',
-        'user_address' => 'sometimes|required|string',
-        'township_id' => 'sometimes|required|exists:townships,id',
-        'user_password' => 'nullable|string|min:6|confirmed'
-      ]);
+    $user->user_name = $request->user_name;
+    $user->save();
 
-      if ($validator->fails()) {
-        return response()->json([
-          'success' => false,
-          'message' => 'Validation error',
-          'errors' => $validator->errors()
-        ], 422);
-      }
+    return response()->json([
+      'success' => true,
+      'message' => 'Name updated successfully',
+      'data' => $user
+    ], 200);
+  }
 
-      // Update basic info
-      if ($request->filled('user_name')) {
-        $user->user_name = $request->user_name;
-      }
-      if ($request->filled('user_address')) {
-        $user->user_address = $request->user_address;
-      }
-      if ($request->filled('township_id')) {
-        $user->township_id = $request->township_id;
-      }
 
-      // Update password if provided
-      if ($request->filled('user_password')) {
-        $user->user_password = Hash::make($request->user_password);
-      }
+  public function updateAddress(Request $request)
+  {
+    $user = $request->user();
 
-      $user->save();
+    $request->validate([
+      'user_address' => 'required|string|max:255'
+    ]);
 
-      // Load township relationship
-      $user->load('township');
+    $user->user_address = $request->user_address;
+    $user->save();
 
-      return response()->json([
-        'success' => true,
-        'message' => 'Profile updated successfully',
-        'data' => [
-          'user' => $user
-        ]
-      ], 200);
-    } catch (\Exception $e) {
+    return response()->json([
+      'success' => true,
+      'message' => 'Address updated successfully',
+      'data' => $user
+    ], 200);
+  }
+
+
+  public function updateTownship(Request $request)
+  {
+    $user = $request->user();
+
+    $request->validate([
+      'township_name' => 'required|string'
+    ]);
+
+
+    $township = Township::where('township_name', $request->township_name)->first();
+
+    if (!$township) {
       return response()->json([
         'success' => false,
-        'message' => 'Profile update failed',
-        'error' => $e->getMessage()
-      ], 500);
+        'message' => 'Township not found'
+      ], 404);
     }
+
+    $user->township_id = $township->township_id;
+    $user->save();
+
+    $user->load('township');
+
+    return response()->json([
+      'success' => true,
+      'message' => 'Township updated successfully',
+      'data' => $user
+    ], 200);
+  }
+
+  //Update password
+  public function updatePassword(Request $request)
+  {
+    $user = $request->user();
+
+    $request->validate([
+      'current_password' => 'required',
+      'new_password' => 'required|string|min:6|confirmed'
+    ]);
+
+    // Check current password
+    if (!Hash::check($request->current_password, $user->user_password)) {
+      return response()->json([
+        'success' => false,
+        'message' => 'Current password is incorrect'
+      ], 401);
+    }
+
+    $user->user_password = Hash::make($request->new_password);
+    $user->save();
+
+    return response()->json([
+      'success' => true,
+      'message' => 'Password updated successfully'
+    ], 200);
   }
 }

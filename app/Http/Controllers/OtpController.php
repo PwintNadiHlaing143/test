@@ -83,6 +83,39 @@ class OtpController extends Controller
   // Resend OTP 
   public function resendOtp(Request $request)
   {
-    return $this->sendOtp($request);
+    $request->validate([
+      'phone' => 'required|string'
+    ]);
+
+    $phone = $request->phone;
+
+
+    $newOtp = rand(100000, 999999);
+    $expiresAt = Carbon::now()->addMinute();
+
+    try {
+      DB::table('otps')->updateOrInsert(
+        ['phone' => $phone],
+        [
+          'otp_code' => $newOtp,
+          'expires_at' => $expiresAt,
+          'updated_at' => now(),
+          'created_at' => now(),
+        ]
+      );
+    } catch (\Exception $e) {
+      return response()->json([
+        'status' => false,
+        'message' => 'Failed to resend OTP',
+        'error' => $e->getMessage()
+      ], 500);
+    }
+
+    return response()->json([
+      'status' => true,
+      'message' => 'New OTP generated successfully',
+      'otp_code' => $newOtp,
+      'expires_in' => '1 minute',
+    ]);
   }
 }

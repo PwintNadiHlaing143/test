@@ -7,14 +7,12 @@ use Illuminate\Http\Request;
 
 class TownshipController extends Controller
 {
-  /**
-   * Get all townships
-   */
+
   public function index()
   {
     try {
-      $townships = Township::select('id', 'name', 'created_at', 'updated_at')
-        ->orderBy('name', 'asc')
+      $townships = Township::select('township_id', 'township_name', 'created_at', 'updated_at')
+        ->orderBy('township_name', 'asc')
         ->get();
 
       return response()->json([
@@ -34,13 +32,10 @@ class TownshipController extends Controller
     }
   }
 
-  /**
-   * Get specific township by ID
-   */
   public function show($id)
   {
     try {
-      $township = Township::select('id', 'name', 'created_at', 'updated_at')
+      $township = Township::select('township_id', 'township_name', 'created_at', 'updated_at')
         ->find($id);
 
       if (!$township) {
@@ -66,14 +61,12 @@ class TownshipController extends Controller
     }
   }
 
-  /**
-   * Search townships by name
-   */
+
   public function search(Request $request)
   {
     try {
       $validator = \Validator::make($request->all(), [
-        'name' => 'required|string|min:2'
+        'township_name' => 'required|string|min:2'
       ]);
 
       if ($validator->fails()) {
@@ -84,9 +77,9 @@ class TownshipController extends Controller
         ], 422);
       }
 
-      $townships = Township::select('id', 'name', 'created_at', 'updated_at')
-        ->where('name', 'like', '%' . $request->name . '%')
-        ->orderBy('name', 'asc')
+      $townships = Township::select('township_id', 'township_name', 'created_at', 'updated_at')
+        ->where('township_name', 'like', '%' . $request->name . '%')
+        ->orderBy('township_name', 'asc')
         ->get();
 
       return response()->json([
@@ -107,15 +100,13 @@ class TownshipController extends Controller
     }
   }
 
-  /**
-   * Get townships with user count
-   */
+
   public function withUserCount()
   {
     try {
       $townships = Township::withCount('users')
-        ->select('id', 'name', 'created_at', 'updated_at')
-        ->orderBy('name', 'asc')
+        ->select('township_id', 'township_name', 'created_at', 'updated_at')
+        ->orderBy('township_name', 'asc')
         ->get();
 
       return response()->json([

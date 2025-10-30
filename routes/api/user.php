@@ -17,8 +17,13 @@ Route::post('/user/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:user-api')->prefix('user')->group(function () {
   Route::get('/profile', [AuthController::class, 'user']);
-  Route::put('/update-profile', [AuthController::class, 'updateProfile']); // ✅ new route
   Route::post('/logout', [AuthController::class, 'logout']);
   Route::delete('/delete-account', [AuthController::class, 'deleteAccount']);
   Route::post('/refresh-token', [AuthController::class, 'refreshTokenSimple']);
+
+  // ✅ Separate update routes
+  Route::put('/update-name', [AuthController::class, 'updateName']);
+  Route::put('/update-address', [AuthController::class, 'updateAddress']);
+  Route::put('/update-township', [AuthController::class, 'updateTownship']);
+  Route::put('/update-password', [AuthController::class, 'updatePassword']);
 });

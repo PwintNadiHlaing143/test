@@ -36,6 +36,6 @@ class User extends Authenticatable
   }
   public function township()
   {
-    return $this->belongsTo(Township::class, 'township_id', 'id');
+    return $this->belongsTo(Township::class, 'township_id', 'township_id');
   }
 }
