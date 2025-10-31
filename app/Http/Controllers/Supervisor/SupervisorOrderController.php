@@ -12,57 +12,89 @@ class SupervisorOrderController extends Controller
 {
 
   //correct supervisor look they assign order
+  // public function myAssignedOrders()
+  // {
+  //   $supervisorId = auth()->id();
+
+  //   $orders = Orders::with(['user', 'product'])
+  //     ->whereHas('deliveryRoutes', function ($query) use ($supervisorId) {
+  //       $query->where('supervisor_id', $supervisorId);
+  //     })
+  //     ->orderBy('order_date', 'desc')
+  //     ->paginate(10);
+
+  //   $ordersData = $orders->items();
+
+  //   if (empty($ordersData)) {
+  //     return response()->json([
+  //       'success' => true,
+  //       'message' => 'No assigned orders found for you.',
+  //       'orders' => [],
+
+  //     ]);
+  //   }
+
+  //   return response()->json([
+  //     'success' => true,
+  //     'message' => 'Assigned orders retrieved successfully.',
+  //     'orders' => $ordersData,
+  //     'total' => $orders->total(),
+  //     'skip' => ($orders->currentPage() - 1) * $orders->perPage(),
+  //     'limit' => $orders->perPage(),
+
+
+  //   ]);
+  // }
+
   public function myAssignedOrders()
   {
     $supervisorId = auth()->id();
 
-    $orders = Orders::with(['user', 'product'])
+    $orders = Orders::with(['user' => function ($query) {
+      $query->withTrashed(); // ✅ Deleted users included
+    }, 'product'])
       ->whereHas('deliveryRoutes', function ($query) use ($supervisorId) {
         $query->where('supervisor_id', $supervisorId);
       })
       ->orderBy('order_date', 'desc')
       ->paginate(10);
 
-    $ordersData = $orders->items();
-
-    if (empty($ordersData)) {
-      return response()->json([
-        'success' => true,
-        'message' => 'No assigned orders found for you.',
-        'orders' => [],
-
-      ]);
-    }
-
     return response()->json([
       'success' => true,
       'message' => 'Assigned orders retrieved successfully.',
-      'orders' => $ordersData,
-      'total' => $orders->total(),
-      'skip' => ($orders->currentPage() - 1) * $orders->perPage(),
-      'limit' => $orders->perPage(),
-
-
+      'orders' => $orders
     ]);
   }
 
-
-
   //all supervisor can look all order
+  // public function allOrders()
+  // {
+  //   $orders = Orders::with(['user', 'product', 'deliveryRoutes'])
+  //     ->orderBy('order_date', 'desc')
+  //     ->paginate(10);
+
+  //   // Use isEmpty()
+  //   if ($orders->isEmpty()) {
+  //     return response()->json([
+  //       'success' => true,
+  //       'message' => 'No orders found in the system.',
+  //       'orders' => $orders
+  //     ]);
+  //   }
+
+  //   return response()->json([
+  //     'success' => true,
+  //     'message' => 'All orders retrieved successfully.',
+  //     'orders' => $orders
+  //   ]);
+  // }
   public function allOrders()
   {
-    $orders = Orders::with(['user', 'product', 'deliveryRoutes'])
+    $orders = Orders::with(['user' => function ($query) {
+      $query->withTrashed(); // ✅ Deleted users included
+    }, 'product', 'deliveryRoutes'])
       ->orderBy('order_date', 'desc')
       ->paginate(10);
-
-    // Use isEmpty()
-    if ($orders->isEmpty()) {
-      return response()->json([
-        'success' => true,
-        'message' => 'No orders found in the system.',
-        'orders' => $orders
-      ]);
-    }
 
     return response()->json([
       'success' => true,
@@ -70,7 +102,6 @@ class SupervisorOrderController extends Controller
       'orders' => $orders
     ]);
   }
-
 
   //correct pending order
   public function pendingOrders()
@@ -210,13 +241,38 @@ class SupervisorOrderController extends Controller
     ]);
   }
 
+  // public function showOrderDetail($orderId)
+  // {
+  //   $order = Orders::with([
+  //     'user.township',
+  //     'product',
+  //     'deliveryRoutes.deliveryGroup',
+  //     'deliveryRoutes.supervisor'
+  //   ])
+  //     ->where('order_id', $orderId)
+  //     ->first();
+
+  //   if (!$order) {
+  //     return response()->json([
+  //       'success' => false,
+  //       'message' => 'Order not found.'
+  //     ], 404);
+  //   }
+
+  //   return response()->json([
+  //     'success' => true,
+  //     'message' => 'Order details retrieved successfully.',
+  //     'order' => $order
+  //   ]);
+  // }
   public function showOrderDetail($orderId)
   {
     $order = Orders::with([
-      'user.township',
+      'user' => function ($query) {
+        $query->withTrashed(); // ✅ Deleted users included
+      },
       'product',
-      'deliveryRoutes.deliveryGroup',
-      'deliveryRoutes.supervisor'
+      'deliveryRoutes.deliveryGroup'
     ])
       ->where('order_id', $orderId)
       ->first();

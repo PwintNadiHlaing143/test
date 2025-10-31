@@ -5,12 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Passport\HasApiTokens;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use App\Models\Orders;
+use App\Models\Township;
 
 class User extends Authenticatable
 {
-  use HasApiTokens, HasFactory, Notifiable;
+  use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
   protected $primaryKey = 'user_id';
 
@@ -22,7 +24,8 @@ class User extends Authenticatable
     'township_id',
     'current_bottles',
     'change_return',
-    'empty_collected'
+    'empty_collected',
+    'is_active',
   ];
 
   protected $hidden = [
@@ -30,6 +33,12 @@ class User extends Authenticatable
     'remember_token',
   ];
 
+  protected $dates = ['deleted_at'];
+
+  public function orders()
+  {
+    return $this->hasMany(Orders::class, 'user_id', 'user_id');
+  }
 
   public function getAuthPassword()
   {
@@ -41,8 +50,40 @@ class User extends Authenticatable
   }
 
   //user and orders relationship
-  public function orders()
+
+  public function scopeActive($query)
   {
-    return $this->hasMany(Orders::class, 'user_id', 'user_id');
+    return $query->where('is_active', true);
+  }
+
+  public function scopeInactive($query)
+  {
+    return $query->where('is_active', false);
+  }
+
+  public function deactivateAccount()
+  {
+    $this->update([
+      'is_active' => false,
+      'deleted_at' => now()
+    ]);
+  }
+
+  public function reactivateAccount()
+  {
+    $this->update([
+      'is_active' => true,
+      'deleted_at' => null
+    ]);
+  }
+  public function isActive()
+  {
+    return $this->is_active && is_null($this->deleted_at);
+  }
+
+
+  public function isDeactivated()
+  {
+    return !$this->is_active || !is_null($this->deleted_at);
   }
 }

@@ -4,6 +4,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\UserProductController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -35,4 +36,11 @@ Route::middleware('auth:user-api')->prefix('user')->group(function () {
   Route::get('/orders/pending', [OrderController::class, 'pendingOrders']);
   Route::get('/orders/completed', [OrderController::class, 'completedOrders']);
   Route::get('/orders/canceled', [OrderController::class, 'canceledOrders']);
+
+  //user look all products
+  Route::get('/products', [UserProductController::class, 'getAllProducts']);
+  Route::get('/products/search', [UserProductController::class, 'searchProducts']);
+  Route::get('/products/featured', [UserProductController::class, 'getFeaturedProducts']);
+  Route::get('/products/stock/{stockStatus}', [UserProductController::class, 'getProductsByStock']);
+  Route::get('/products/{productId}', [UserProductController::class, 'getProduct']);
 });

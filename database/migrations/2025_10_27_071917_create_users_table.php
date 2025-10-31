@@ -17,7 +17,8 @@ return new class extends Migration
       $table->integer('current_bottles')->default(0);
       $table->decimal('change_return', 10, 2)->default(0.0);
       $table->integer('empty_collected')->default(0);
-
+      $table->boolean('is_active')->default(true);
+      $table->softDeletes(); // Adds deleted_at column
 
       $table->unsignedBigInteger('township_id');
 

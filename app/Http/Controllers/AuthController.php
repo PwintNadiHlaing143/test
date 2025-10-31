@@ -184,10 +184,12 @@ class AuthController extends Controller
     return $refreshToken->accessToken;
   }
 
+
+
+
   public function deleteAccount(Request $request)
   {
     try {
-
       if (!$request->user()) {
         return response()->json([
           'success' => false,
@@ -196,7 +198,6 @@ class AuthController extends Controller
       }
 
       $user = $request->user();
-
 
       $validator = Validator::make($request->all(), [
         'user_password' => 'required|string',
@@ -210,18 +211,20 @@ class AuthController extends Controller
         ], 422);
       }
 
-
       if (!Hash::check($request->user_password, $user->user_password)) {
         return response()->json([
           'success' => false,
           'message' => 'Invalid password'
         ], 401);
       }
+
+      // ✅ Soft delete only - Order history automatically preserved
       $user->tokens()->delete();
-      $user->delete();
+      $user->delete(); // This is soft delete, orders remain in database
+
       return response()->json([
         'success' => true,
-        'message' => 'Account deleted successfully'
+        'message' => 'Account deleted successfully. Your order history has been preserved.'
       ], 200);
     } catch (\Exception $e) {
       return response()->json([
@@ -231,6 +234,7 @@ class AuthController extends Controller
       ], 500);
     }
   }
+
   public function user(Request $request)
   {
     $user = $request->user()->load('township');
@@ -243,6 +247,8 @@ class AuthController extends Controller
     ], 200);
   }
 
+
+  //correct logout
   public function logout(Request $request)
   {
     try {
@@ -270,6 +276,8 @@ class AuthController extends Controller
     }
   }
 
+
+  //correct update name
   public function updateName(Request $request)
   {
     $user = $request->user();
@@ -288,7 +296,7 @@ class AuthController extends Controller
     ], 200);
   }
 
-
+  //correct update address
   public function updateAddress(Request $request)
   {
     $user = $request->user();
@@ -307,7 +315,7 @@ class AuthController extends Controller
     ], 200);
   }
 
-
+  //correct update township
   public function updateTownship(Request $request)
   {
     $user = $request->user();
@@ -338,7 +346,7 @@ class AuthController extends Controller
     ], 200);
   }
 
-  //Update password
+  //correct Update password
   public function updatePassword(Request $request)
   {
     $user = $request->user();

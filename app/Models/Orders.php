@@ -4,22 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Products;
-use App\Models\User;
-use App\Models\Owner;
-use App\Models\DeliveryRoute;
 
 class Orders extends Model
 {
   use HasFactory;
 
-  // Table name (optional if table name is 'orders')
   protected $table = 'orders';
-
-  // Primary key
   protected $primaryKey = 'order_id';
 
-  // Fillable fields
   protected $fillable = [
     'owner_id',
     'product_id',
@@ -35,33 +27,135 @@ class Orders extends Model
     'notes'
   ];
 
-  // Relationships
+  protected $casts = [
+    'order_date' => 'datetime',
+    'total_amount' => 'decimal:2',
+    'sold_price' => 'decimal:2',
+    'cash_collected' => 'decimal:2',
+    'change_returned' => 'decimal:2',
+    'empty_collected' => 'integer',
+  ];
 
-  // User who made the order
+  // Relationships
   public function user()
   {
-    return $this->belongsTo(User::class, 'user_id', 'user_id');
-  }
-  public function deliveryRoutes()
-  {
-    return $this->hasMany(DeliveryRoute::class, 'order_id', 'order_id');
+    return $this->belongsTo(User::class, 'user_id', 'user_id')->withTrashed();
   }
 
-  // Product being ordered
   public function product()
   {
     return $this->belongsTo(Products::class, 'product_id', 'product_id');
   }
 
-  // Owner (seller) of the product
   public function owner()
   {
     return $this->belongsTo(Owner::class, 'owner_id', 'owner_id');
   }
 
-  // Township where the order is delivered
-  public function township()
+  public function deliveryRoutes()
   {
-    return $this->belongsTo(Township::class, 'township_id', 'township_id');
+    return $this->hasMany(DeliveryRoute::class, 'order_id', 'order_id');
+  }
+
+  // Scopes
+  public function scopeActiveUsers($query)
+  {
+    return $query->whereHas('user', function ($q) {
+      $q->active();
+    });
+  }
+
+  public function scopeWithInactiveUsers($query)
+  {
+    return $query->whereHas('user', function ($q) {
+      $q->withTrashed();
+    });
+  }
+
+  public function scopePending($query)
+  {
+    return $query->where('order_status', 'pending');
+  }
+
+  public function scopeProcessing($query)
+  {
+    return $query->where('order_status', 'processing');
+  }
+
+  public function scopeDelivered($query)
+  {
+    return $query->where('order_status', 'delivered');
+  }
+
+  public function scopeCancelled($query)
+  {
+    return $query->where('order_status', 'cancelled');
+  }
+
+  // Helper Methods
+  public function isPending()
+  {
+    return $this->order_status === 'pending';
+  }
+
+  public function isDelivered()
+  {
+    return $this->order_status === 'delivered';
+  }
+
+  public function isCancelled()
+  {
+    return $this->order_status === 'cancelled';
+  }
+
+
+  public function getFormattedTotalAttribute()
+  {
+    // Check if total_amount is not null and convert to float
+    if ($this->total_amount !== null) {
+      return number_format((float)$this->total_amount, 2) . ' MMK';
+    }
+
+    return '0.00 MMK';
+  }
+
+
+  public function getFormattedOrderDateAttribute()
+  {
+    // Check if order_date exists and is a valid date
+    if ($this->order_date) {
+      return $this->order_date->format('M d, Y h:i A');
+    }
+
+    return 'N/A';
+  }
+
+  public function getFormattedSoldPriceAttribute()
+  {
+    if ($this->sold_price !== null) {
+      return number_format((float)$this->sold_price, 2) . ' MMK';
+    }
+
+    return '0.00 MMK';
+  }
+
+
+  public function getFormattedCashCollectedAttribute()
+  {
+    if ($this->cash_collected !== null) {
+      return number_format((float)$this->cash_collected, 2) . ' MMK';
+    }
+
+    return '0.00 MMK';
+  }
+
+
+  public function getFormattedChangeReturnedAttribute()
+  {
+    if ($this->change_returned !== null) {
+      return number_format((float)$this->change_returned, 2) . ' MMK';
+    }
+
+    return '0.00 MMK';
   }
 }
