@@ -14,10 +14,19 @@ class OwnerSeeder extends Seeder
   public function run(): void
   {
     // Insert default admin 
-    DB::table('owner')->insert([
-      'owner_name'     => 'Pwint',
-      'owner_phone'    => '09669211320',
-      'owner_password' => Hash::make('password123'),
-    ]);
+    DB::table('owner')->insert(
+      values: [
+        [
+          'owner_name'     => 'Pwint',
+          'owner_phone'    => '09669211320',
+          'owner_password' => Hash::make('password123'),
+        ],
+        [
+          'owner_name'     => 'PwintNadihlaing',
+          'owner_phone'    => '09669211321',
+          'owner_password' => Hash::make('pwint123'),
+        ],
+      ]
+    );
   }
 }

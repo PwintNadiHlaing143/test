@@ -2,7 +2,7 @@
 
 
 use App\Http\Controllers\DeliveryStaffAuthController;
-use App\Http\Controllers\SupervisorController;
+use App\Http\Controllers\Supervisor\SupervisorController;
 
 use Illuminate\Support\Facades\Route;
 

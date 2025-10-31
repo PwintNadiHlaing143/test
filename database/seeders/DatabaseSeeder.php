@@ -19,7 +19,9 @@ class DatabaseSeeder extends Seeder
       SupervisorSeeder::class,
       DeliveryGroupSeeder::class,
       DeliveryStaffSeeder::class,
-      ProductSeeder::class
+      ProductSeeder::class,
+      OrderSeeder::class,
+      DeliveryRouteSeeder::class,
 
     ]);
   }

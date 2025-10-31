@@ -51,7 +51,7 @@ class Products extends Model
   //Relationship with Orders
   public function orders()
   {
-    return $this->hasMany(Order::class, 'product_id', 'product_id');
+    return $this->hasMany(Orders::class, 'product_id', 'product_id');
   }
 
   //Accessor for product status

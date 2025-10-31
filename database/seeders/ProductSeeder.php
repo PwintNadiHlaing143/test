@@ -27,7 +27,7 @@ class ProductSeeder extends Seeder
         'updated_at' => now(),
       ],
       [
-        'owner_id' => 1,
+        'owner_id' => 2,
         'product_name' => 'Mineral Water',
         'unit_price' => 1200.00,
         'current_stock' => 150,

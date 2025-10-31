@@ -2,7 +2,7 @@
 
 
 use App\Http\Controllers\OwnerProductController;
-use App\Http\Controllers\SupervisorController;
+use App\Http\Controllers\Supervisor\SupervisorController;
 use App\Http\Controllers\OwnerAuthController;
 
 

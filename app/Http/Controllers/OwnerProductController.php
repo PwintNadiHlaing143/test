@@ -14,9 +14,7 @@ class OwnerProductController extends Controller
     $this->middleware('auth:api'); // Passport middleware
   }
 
-  /**
-   * Display a listing of the resource.
-   */
+
   public function index(Request $request): JsonResponse
   {
     try {

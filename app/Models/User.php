@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Passport\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
+use App\Models\Orders;
 
 class User extends Authenticatable
 {
@@ -37,5 +38,11 @@ class User extends Authenticatable
   public function township()
   {
     return $this->belongsTo(Township::class, 'township_id', 'township_id');
+  }
+
+  //user and orders relationship
+  public function orders()
+  {
+    return $this->hasMany(Orders::class, 'user_id', 'user_id');
   }
 }

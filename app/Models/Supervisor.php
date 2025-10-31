@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Passport\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
+use App\Models\Orders;
+use App\Models\DeliveryRoute;
 
 class Supervisor extends Authenticatable
 {
@@ -40,5 +42,46 @@ class Supervisor extends Authenticatable
   public function owner()
   {
     return $this->belongsTo(Owner::class, 'owner_id');
+  }
+  // Supervisor has many delivery groups
+  public function deliveryGroups()
+  {
+    return $this->hasMany(DeliveryGroup::class, 'supervisor_id', 'supervisor_id');
+  }
+
+  // Supervisor has many delivery routes
+  public function deliveryRoutes()
+  {
+    return $this->hasMany(DeliveryRoute::class, 'supervisor_id', 'supervisor_id');
+  }
+
+  // Supervisor can access orders through delivery routes
+  public function orders()
+  {
+    return $this->hasManyThrough(
+      Orders::class,
+      DeliveryRoute::class,
+      'supervisor_id', // Foreign key on delivery_routes table
+      'order_id',      // Foreign key on orders table  
+      'supervisor_id', // Local key on supervisors table
+      'order_id'       // Local key on delivery_routes table
+    );
+  }
+
+  // Pending orders that need assignment (no delivery route yet)
+  public function pendingOrders()
+  {
+    return Orders::where('order_status', 'pending')
+      ->whereDoesntHave('deliveryRoutes')
+      ->get();
+  }
+
+  // Assigned orders (have delivery routes)
+  public function assignedOrders()
+  {
+    return $this->orders()
+      ->with(['user', 'product'])
+      ->whereHas('deliveryRoutes')
+      ->get();
   }
 }

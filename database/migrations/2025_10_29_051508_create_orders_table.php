@@ -6,9 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-  /**
-   * Run the migrations.
-   */
+
   public function up(): void
   {
     Schema::create('orders', function (Blueprint $table) {
@@ -27,16 +25,19 @@ return new class extends Migration
       $table->text('notes')->nullable();
       $table->timestamps();
 
+
       // Foreign key constraints
       $table->foreign('owner_id')
         ->references('owner_id')
         ->on('owner')
-        ->onDelete('cascade');
+        ->onDelete('cascade')
+        ->onUpdate(action: 'cascade');
 
       $table->foreign('product_id')
         ->references('product_id')
         ->on('products')
-        ->onDelete('cascade');
+        ->onDelete('cascade')
+        ->onUpdate(action: 'cascade');
 
       // Indexes
       $table->index('owner_id');
@@ -44,9 +45,7 @@ return new class extends Migration
       $table->index('user_id');
     });
   }
-  /**
-   * Reverse the migrations.
-   */
+
   public function down(): void
   {
     Schema::dropIfExists('orders');

@@ -6,9 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-  /**
-   * Run the migrations.
-   */
+
   public function up(): void
   {
     Schema::create('delivery_group', function (Blueprint $table) {
@@ -16,7 +14,6 @@ return new class extends Migration
       $table->string('group_name', 100);
       $table->unsignedBigInteger('supervisor_id');
 
-      // Fix: reference 'supervisors' table (plural) not 'supervisor'
       $table->foreign('supervisor_id')
         ->references('supervisor_id')
         ->on('supervisors') // Changed from 'supervisor' to 'supervisors'
@@ -27,9 +24,6 @@ return new class extends Migration
     });
   }
 
-  /**
-   * Reverse the migrations.
-   */
   public function down(): void
   {
     Schema::dropIfExists('delivery_group_status_to_delivery_group');

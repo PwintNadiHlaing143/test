@@ -12,7 +12,7 @@ class TownshipFactory extends Factory
   public function definition(): array
   {
     return [
-      'township_name' => $this->faker->city(), // random city name
+      'township_name' => $this->faker->city(),
     ];
   }
 }
