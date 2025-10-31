@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\User;
+
+use App\Http\Controllers\Controller;
 
 use App\Models\User;
 use App\Models\Township;
@@ -218,9 +220,9 @@ class AuthController extends Controller
         ], 401);
       }
 
-      // ✅ Soft delete only - Order history automatically preserved
+
       $user->tokens()->delete();
-      $user->delete(); // This is soft delete, orders remain in database
+      $user->delete();
 
       return response()->json([
         'success' => true,

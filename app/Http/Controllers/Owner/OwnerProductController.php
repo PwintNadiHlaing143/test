@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Owner;
 
+use App\Http\Controllers\Controller;
 use App\Models\Products;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -11,7 +12,7 @@ class OwnerProductController extends Controller
 {
   public function __construct()
   {
-    $this->middleware('auth:api'); // Passport middleware
+    $this->middleware('auth:api');
   }
 
 
@@ -76,9 +77,7 @@ class OwnerProductController extends Controller
     }
   }
 
-  /**
-   * Store a newly created resource in storage.
-   */
+
   public function store(Request $request): JsonResponse
   {
     try {
@@ -116,9 +115,7 @@ class OwnerProductController extends Controller
     }
   }
 
-  /**
-   * Display the specified resource.
-   */
+
   public function show(string $id): JsonResponse
   {
     try {
@@ -148,9 +145,7 @@ class OwnerProductController extends Controller
     }
   }
 
-  /**
-   * Update the specified resource in storage.
-   */
+
   public function update(Request $request, string $id): JsonResponse
   {
     try {
@@ -197,9 +192,7 @@ class OwnerProductController extends Controller
     }
   }
 
-  /**
-   * Remove the specified resource from storage.
-   */
+
   public function destroy(string $id): JsonResponse
   {
     try {
@@ -242,9 +235,7 @@ class OwnerProductController extends Controller
     }
   }
 
-  /**
-   * Update product stock
-   */
+
   public function updateStock(Request $request, string $id): JsonResponse
   {
     try {
@@ -291,9 +282,6 @@ class OwnerProductController extends Controller
     }
   }
 
-  /**
-   * Update product price
-   */
   public function updatePrice(Request $request, string $id): JsonResponse
   {
     try {

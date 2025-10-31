@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\TownshipController;
+use App\Http\Controllers\Township\TownshipController;
 
 use Illuminate\Support\Facades\Route;
 

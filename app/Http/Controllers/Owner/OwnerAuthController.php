@@ -1,16 +1,15 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Owner;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Owner; // သင့် project မှာ Owner model
+use App\Models\Owner;
 use Illuminate\Support\Facades\Hash;
 
 class OwnerAuthController extends Controller
 {
-  /**
-   * Owner login API
-   */
+
   public function login(Request $request)
   {
     $request->validate([

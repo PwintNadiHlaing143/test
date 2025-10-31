@@ -1,9 +1,8 @@
 <?php
 
-
-use App\Http\Controllers\OwnerProductController;
+use App\Http\Controllers\Owner\OwnerProductController;
 use App\Http\Controllers\Supervisor\SupervisorController;
-use App\Http\Controllers\OwnerAuthController;
+use App\Http\Controllers\Owner\OwnerAuthController;
 
 
 use Illuminate\Support\Facades\Route;

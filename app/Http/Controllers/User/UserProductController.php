@@ -1,7 +1,7 @@
 <?php
-// app/Http/Controllers/User/UserProductController.php
 
-namespace App\Http\Controllers;
+
+namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Products;
@@ -9,9 +9,7 @@ use Illuminate\Http\Request;
 
 class UserProductController extends Controller
 {
-  /**
-   * Get all active products for users
-   */
+
   public function getAllProducts(Request $request)
   {
     $products = Products::with('owner')
@@ -28,9 +26,7 @@ class UserProductController extends Controller
     ]);
   }
 
-  /**
-   * Get product details by ID
-   */
+
   public function getProduct($productId)
   {
     $product = Products::with('owner')
@@ -51,9 +47,7 @@ class UserProductController extends Controller
     ]);
   }
 
-  /**
-   * Search products by name
-   */
+
   public function searchProducts(Request $request)
   {
     $request->validate([
@@ -79,9 +73,7 @@ class UserProductController extends Controller
     ]);
   }
 
-  /**
-   * Get products by stock status
-   */
+
   public function getProductsByStock($stockStatus)
   {
     $validStatuses = ['in-stock', 'low-stock', 'out-of-stock'];
@@ -121,9 +113,6 @@ class UserProductController extends Controller
     ]);
   }
 
-  /**
-   * Get featured products (you can define your own logic)
-   */
   public function getFeaturedProducts()
   {
     $products = Products::with('owner')

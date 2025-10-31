@@ -65,7 +65,7 @@ return [
       'throttle' => 60,
     ],
 
-    // ✅ ADD these password reset configs
+
     'owners' => [
       'provider' => 'owners',
       'table' => 'password_reset_tokens',

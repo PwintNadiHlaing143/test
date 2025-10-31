@@ -1,7 +1,7 @@
 <?php
 
 
-use App\Http\Controllers\OtpController;
+use App\Http\Controllers\OTP\OtpController;
 
 use Illuminate\Support\Facades\Route;
 

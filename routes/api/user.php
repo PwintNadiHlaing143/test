@@ -1,15 +1,9 @@
 <?php
 
-
-
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\User\AuthController;
 use App\Http\Controllers\OrderController;
-use App\Http\Controllers\UserProductController;
-
+use App\Http\Controllers\User\UserProductController;
 use Illuminate\Support\Facades\Route;
-
-
-
 
 //for user
 Route::post('/user/register', [AuthController::class, 'register']);
@@ -31,8 +25,6 @@ Route::middleware('auth:user-api')->prefix('user')->group(function () {
   Route::post('/orders', [OrderController::class, 'createOrder']);
   // Route::get('/orders/{order_id}', [OrderController::class, 'showOrder']);
   Route::patch('/orders/{order_id}/status', [OrderController::class, 'updateStatus']); // optional
-
-
   Route::get('/orders/pending', [OrderController::class, 'pendingOrders']);
   Route::get('/orders/completed', [OrderController::class, 'completedOrders']);
   Route::get('/orders/canceled', [OrderController::class, 'canceledOrders']);

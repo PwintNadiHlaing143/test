@@ -1,12 +1,10 @@
 <?php
 
 
-use App\Http\Controllers\DeliveryStaffAuthController;
+use App\Http\Controllers\Delivery\DeliveryStaffAuthController;
 use App\Http\Controllers\Supervisor\SupervisorController;
 
 use Illuminate\Support\Facades\Route;
-
-
 
 
 Route::middleware('auth:supervisor-api')->prefix('supervisor')->group(function () {
