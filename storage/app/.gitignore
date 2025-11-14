@@ -1,0 +1,4 @@
+*
+!public/
+!.gitignore
+/storage/firebase/service-account.json

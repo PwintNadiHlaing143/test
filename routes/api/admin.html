@@ -1,0 +1,1699 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Admin Dashboard - Dynamic Content</title>
+
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+        />
+
+        <link
+            href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            /* --- CSS Variables (Updated for new card styles) --- */
+            :root {
+                --primary: #3a0ca3; /* Deep Purple-Blue */
+                --primary-light: #4361ee; /* Vibrant Blue */
+                --secondary: #7209b7; /* Darker Purple */
+                --success: #4cc9f0; /* Light Blue-Green */
+                --danger: #f72585; /* Bright Pink */
+                --warning: #f8961e; /* Orange */
+                --info: #4895ef; /* Medium Blue */
+                --dark-sidebar-bg: #1a1a2e; /* Very Dark Blue for Sidebar */
+                --dark-sidebar-text: #e0e0e0; /* Light text for sidebar */
+                --light-bg: #f5f7fb; /* Light background for main content */
+                --white: #ffffff;
+                --border-color: #e9ecef; /* Light gray border */
+                --text-color: #2d3748; /* Dark gray for main text */
+                --text-light-color: #718096; /* Lighter gray for secondary text */
+                --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+                    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+                --shadow-sm: 0 4px 10px rgba(0, 0, 0, 0.05); /* Adjusted for card */
+                --radius: 10px;
+                --radius-sm: 6px;
+                --sidebar-width: 260px;
+                --header-height: 70px;
+                --transition: all 0.3s ease;
+            }
+
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: "Poppins", sans-serif;
+            }
+
+            body {
+                background-color: var(--light-bg);
+                color: var(--text-color);
+                overflow-x: hidden;
+            }
+
+            /* Custom Scrollbar */
+            ::-webkit-scrollbar {
+                width: 8px;
+                height: 8px;
+            }
+
+            ::-webkit-scrollbar-track {
+                background: var(--light-bg);
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: #ced4da; /* Lighter scrollbar */
+                border-radius: 10px;
+            }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: #adb5bd;
+            }
+
+            /* Layout */
+            .container {
+                display: flex;
+                min-height: 100vh;
+            }
+
+            /* Sidebar */
+            .sidebar {
+                width: var(--sidebar-width);
+                flex-shrink: 0;
+                background: var(--dark-sidebar-bg);
+                color: var(--dark-sidebar-text);
+                overflow-y: auto;
+                transition: var(--transition);
+                box-shadow: var(--shadow);
+                z-index: 1000;
+                position: fixed; /* Fixed position */
+                height: 100%;
+                transform: translateX(0); /* Default desktop position */
+            }
+
+            /* Mobile override for fixed sidebar */
+            @media (max-width: 992px) {
+                .sidebar {
+                    transform: translateX(-100%);
+                }
+                .sidebar.active {
+                    transform: translateX(0);
+                }
+            }
+
+            .logo {
+                padding: 24px 20px;
+                text-align: center;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+                margin-bottom: 10px;
+            }
+
+            .logo h1 {
+                font-size: 26px;
+                font-weight: 700;
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                letter-spacing: 0.5px;
+            }
+
+            .logo span {
+                color: var(--primary-light);
+                background: linear-gradient(
+                    45deg,
+                    var(--primary-light),
+                    var(--success)
+                );
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+                margin-left: 4px;
+            }
+
+            .nav-menu {
+                padding: 10px 0;
+            }
+
+            .menu-heading {
+                padding: 16px 25px 8px;
+                font-size: 11px;
+                text-transform: uppercase;
+                letter-spacing: 1.2px;
+                color: rgba(255, 255, 255, 0.5);
+                font-weight: 500;
+            }
+
+            .nav-item {
+                padding: 12px 25px;
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+                transition: var(--transition);
+                border-left: 4px solid transparent; /* Default transparent border */
+                margin: 4px 0;
+                border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .nav-item::after {
+                content: "";
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 0;
+                height: 1px;
+                background: linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.1),
+                    transparent
+                );
+                transition: var(--transition);
+            }
+
+            .nav-item:hover::after {
+                width: 100%;
+            }
+
+            .nav-item:hover,
+            .nav-item.active {
+                background-color: rgba(
+                    67,
+                    97,
+                    238,
+                    0.15
+                ); /* Lighter blue highlight */
+                border-left-color: var(
+                    --primary-light
+                ); /* Vibrant blue active line */
+                color: var(--white); /* White text on active */
+            }
+
+            .nav-item i {
+                width: 24px;
+                margin-right: 12px;
+                font-size: 18px;
+                text-align: center;
+                transition: var(--transition);
+            }
+
+            .nav-item:hover i {
+                transform: translateY(-2px);
+            }
+
+            /* Content Wrapper */
+            .content-wrapper {
+                flex-grow: 1;
+                margin-left: var(
+                    --sidebar-width
+                ); /* Space for desktop sidebar */
+                transition: margin-left 0.3s;
+                display: flex;
+                flex-direction: column;
+            }
+
+            /* Mobile override for content wrapper */
+            @media (max-width: 992px) {
+                .content-wrapper {
+                    margin-left: 0;
+                }
+            }
+
+            /* Header */
+            .header {
+                height: var(--header-height);
+                background-color: var(--white);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0 30px;
+                box-shadow: var(--shadow-sm);
+                z-index: 500;
+                position: sticky;
+                top: 0;
+            }
+
+            .menu-toggle {
+                cursor: pointer;
+                font-size: 24px;
+                color: var(--text-light-color);
+                width: 44px;
+                height: 44px;
+                display: none; /* Hidden on desktop */
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+                transition: var(--transition);
+            }
+
+            @media (max-width: 992px) {
+                .menu-toggle {
+                    display: flex; /* Show on tablet/mobile */
+                }
+            }
+
+            .search-bar {
+                display: flex;
+                align-items: center;
+                background-color: var(--light-bg);
+                border-radius: 50px; /* Fully rounded */
+                padding: 8px 18px;
+                flex: 0 0 450px;
+                border: 1px solid var(--border-color);
+                transition: var(--transition);
+                box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05); /* Inner shadow for depth */
+            }
+
+            .search-bar:focus-within {
+                box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2); /* Focus ring */
+                border-color: var(--primary-light);
+            }
+
+            .search-bar input {
+                border: none;
+                background: transparent;
+                outline: none;
+                width: 100%;
+                padding: 0 10px;
+                color: var(--text-color);
+                font-size: 15px;
+            }
+
+            .search-bar i {
+                color: var(--text-light-color);
+                font-size: 16px;
+            }
+
+            .header-actions {
+                display: flex;
+                align-items: center;
+            }
+
+            .icon-action {
+                position: relative;
+                margin: 0 10px;
+                cursor: pointer;
+                width: 44px;
+                height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+                color: var(--text-light-color);
+                transition: var(--transition);
+            }
+
+            .icon-action:hover {
+                background-color: rgba(67, 97, 238, 0.05);
+                color: var(--primary-light);
+            }
+
+            .icon-action i {
+                font-size: 18px;
+            }
+
+            .icon-action .badge {
+                position: absolute;
+                top: 5px;
+                right: 5px;
+                background-color: var(--danger);
+                color: white;
+                border-radius: 50%;
+                width: 16px;
+                height: 16px;
+                font-size: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 600;
+                border: 2px solid var(--white);
+            }
+
+            .user-profile {
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+                padding: 8px 12px;
+                border-radius: var(--radius);
+                transition: var(--transition);
+                margin-left: 10px;
+            }
+
+            .user-profile:hover {
+                background-color: rgba(67, 97, 238, 0.05);
+            }
+
+            .profile-img {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background: linear-gradient(
+                    135deg,
+                    var(--secondary),
+                    var(--primary)
+                );
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-weight: 600;
+                margin-right: 12px;
+                font-size: 16px;
+                box-shadow: 0 4px 8px rgba(114, 9, 183, 0.3);
+            }
+
+            .user-info {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .user-name {
+                font-weight: 600;
+                font-size: 15px;
+                color: var(--text-color);
+            }
+
+            .user-role {
+                font-size: 12px;
+                color: var(--text-light-color);
+            }
+
+            /* Main Content */
+            .main-content {
+                padding: 25px 30px;
+                flex-grow: 1;
+            }
+
+            .page-header {
+                margin-bottom: 20px; /* Reduced margin */
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .page-header h2 {
+                font-size: 32px;
+                font-weight: 700;
+                color: var(--text-color);
+                transition: opacity 0.3s ease;
+            }
+
+            /* Date and Filter Controls */
+            .filter-controls {
+                display: flex;
+                align-items: center;
+                gap: 15px; /* Spacing between elements */
+            }
+
+            .date-input-wrapper {
+                position: relative;
+            }
+
+            .date-input {
+                background-color: var(--white);
+                border: 1px solid var(--border-color);
+                border-radius: var(--radius);
+                padding: 10px 15px;
+                font-size: 14px;
+                color: var(--text-color);
+                outline: none;
+                cursor: pointer;
+                appearance: none; /* Remove default arrow */
+                width: 170px; /* Fixed width as in image */
+                text-align: left;
+                padding-right: 35px; /* Space for dropdown icon */
+                box-shadow: var(--shadow-sm); /* Similar shadow to cards */
+                transition: var(--transition);
+            }
+            .date-input:hover {
+                border-color: var(--primary-light);
+            }
+
+            .date-input-wrapper .dropdown-icon {
+                position: absolute;
+                right: 15px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: var(--text-light-color);
+                font-size: 12px;
+                pointer-events: none; /* Clicks go through to input */
+            }
+
+            /* Dashboard Cards */
+            .stats-cards {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+                gap: 25px;
+                margin-bottom: 30px;
+            }
+
+            .stat-card {
+                background-color: var(--white);
+                border-radius: var(--radius);
+                padding: 24px; /* Adjusted padding to match image */
+                box-shadow: var(--shadow-sm); /* Softer shadow */
+                transition: var(--transition);
+                border: 1px solid #f0f0f0; /* Very light border */
+                overflow: hidden;
+                position: relative; /* Needed for top border pseudo-element */
+            }
+
+            .stat-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); /* Enhanced hover shadow */
+            }
+
+            /* New: Top Border for Cards */
+            .stat-card::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 4px; /* Height of the top border */
+                border-top-left-radius: var(--radius);
+                border-top-right-radius: var(--radius);
+            }
+
+            .stat-card.blue-border::before {
+                background-image: linear-gradient(
+                    90deg,
+                    #4361ee,
+                    #4895ef
+                ); /* Blue gradient */
+            }
+            .stat-card.purple-border::before {
+                background-image: linear-gradient(
+                    90deg,
+                    #7209b7,
+                    #b5179e
+                ); /* Purple gradient */
+            }
+            .stat-card.green-border::before {
+                background-image: linear-gradient(
+                    90deg,
+                    #48b04e,
+                    #8bc34a
+                ); /* Green gradient */
+            }
+            .stat-card.orange-border::before {
+                background-image: linear-gradient(
+                    90deg,
+                    #f8961e,
+                    #f9c74f
+                ); /* Orange gradient */
+            }
+
+            .card-top {
+                display: flex;
+                justify-content: space-between;
+                align-items: center; /* Vertically center icon with text */
+                margin-bottom: 15px; /* Spacing between top and value */
+            }
+
+            .card-icon {
+                width: 50px; /* Smaller icon size */
+                height: 50px;
+                border-radius: 12px; /* Rounded square, not full circle */
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 22px; /* Adjusted icon size */
+                color: white;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for icon */
+                transition: var(--transition);
+                flex-shrink: 0; /* Prevent icon from shrinking */
+            }
+            .stat-card:hover .card-icon {
+                transform: translateY(-2px) scale(1.05); /* Slight lift and scale on hover */
+            }
+
+            /* Card Icon Colors (from reference image) */
+            .card-icon.blue-gradient {
+                background: linear-gradient(
+                    135deg,
+                    #4361ee,
+                    #4895ef
+                ); /* Primary Blue */
+            }
+            .card-icon.purple-gradient {
+                background: linear-gradient(
+                    135deg,
+                    #7209b7,
+                    #b5179e
+                ); /* Purple/Pink */
+            }
+            .card-icon.green-gradient {
+                background: linear-gradient(
+                    135deg,
+                    #48b04e,
+                    #8bc34a
+                ); /* Adjusted to a clear green */
+            }
+            .card-icon.orange-gradient {
+                background: linear-gradient(
+                    135deg,
+                    #f8961e,
+                    #f9c74f
+                ); /* Orange */
+            }
+
+            .card-value {
+                font-size: 28px; /* Slightly smaller value font */
+                font-weight: 700;
+                color: var(--text-color);
+                margin-bottom: 5px; /* Adjusted spacing */
+                line-height: 1.2;
+            }
+
+            .card-label {
+                color: var(--text-light-color);
+                font-size: 14px; /* Slightly smaller label font */
+                font-weight: 500;
+            }
+
+            .card-bottom-text {
+                margin-top: 15px; /* Space between value/label and bottom text */
+                display: inline-block;
+                padding: 6px 10px;
+                border-radius: var(--radius-sm);
+                font-size: 13px;
+                font-weight: 500;
+                line-height: 1;
+                text-align: center;
+            }
+
+            /* Specific colors for bottom texts */
+            .card-bottom-text.blue-light {
+                background-color: rgba(
+                    67,
+                    97,
+                    238,
+                    0.1
+                ); /* Light blue background */
+                color: #4361ee; /* Darker blue text */
+            }
+            .card-bottom-text.purple-light {
+                background-color: rgba(
+                    114,
+                    9,
+                    183,
+                    0.1
+                ); /* Light purple background */
+                color: #7209b7; /* Darker purple text */
+            }
+            .card-bottom-text.green-light {
+                background-color: rgba(
+                    76,
+                    175,
+                    80,
+                    0.1
+                ); /* Light green background */
+                color: #4caf50; /* Darker green text */
+            }
+            .card-bottom-text.orange-light {
+                background-color: rgba(
+                    248,
+                    150,
+                    30,
+                    0.1
+                ); /* Light orange background */
+                color: #f8961e; /* Darker orange text */
+            }
+
+            /* Data Table */
+            .table-card {
+                background-color: var(--white);
+                border-radius: var(--radius);
+                box-shadow: var(
+                    --shadow
+                ); /* Increased shadow for better visibility */
+                overflow: hidden;
+                margin-bottom: 25px;
+                border: 1px solid var(--border-color);
+            }
+
+            .card-title {
+                padding: 16px 24px; /* Adjusted padding to be cleaner */
+                border-bottom: 1px solid var(--border-color);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                background-color: #f8f9fa; /* Lighter header for table */
+            }
+
+            .card-title h3 {
+                font-size: 16px; /* Smaller title font */
+                font-weight: 600;
+                color: var(--text-color);
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+
+            .data-table {
+                width: 100%;
+                min-width: 600px; /* Adjusted minimum width for new column structure */
+                border-collapse: separate;
+                border-spacing: 0;
+            }
+
+            /* --- UPDATED TABLE CELL PADDING & FONT SIZE --- */
+            .data-table th,
+            .data-table td {
+                padding: 10px 24px; /* Reduced vertical padding further for compactness */
+                text-align: left;
+                font-size: 13px; /* Reduced font size for tighter look */
+                vertical-align: middle;
+            }
+
+            /* Specific styling for the truncated User ID column */
+            .data-table .col-id {
+                max-width: 90px; /* Set a maximum width */
+                width: 90px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                font-weight: 600;
+                color: var(--primary);
+            }
+
+            .data-table .col-name {
+                width: 180px;
+                font-weight: 600; /* Bold name column */
+            }
+
+            .data-table .col-contact {
+                width: 160px; /* Fixed width for phone number */
+            }
+
+            .data-table .col-status {
+                width: 120px;
+            }
+
+            .data-table .col-actions {
+                width: 100px;
+            }
+
+            .data-table th {
+                font-weight: 600;
+                color: var(--text-light-color);
+                background-color: #f8f9fa;
+                position: sticky;
+                top: 0;
+                box-shadow: 0 1px 0 0 var(--border-color);
+            }
+
+            .data-table td {
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .data-table tr:last-child td {
+                border-bottom: none;
+            }
+
+            .data-table tbody tr:hover {
+                background-color: rgba(67, 97, 238, 0.03);
+                transform: translateY(-1px);
+                box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+            }
+
+            .status {
+                padding: 5px 10px; /* Reduced badge padding */
+                border-radius: 50px;
+                font-size: 12px; /* Smaller badge font */
+                font-weight: 600;
+                display: inline-flex;
+                align-items: center;
+                line-height: 1;
+                text-transform: capitalize;
+            }
+
+            .status i {
+                margin-right: 4px; /* Reduced icon margin */
+                font-size: 10px;
+            }
+
+            /* Status Colors (from image) */
+            .status.active-status {
+                /* Renamed to avoid conflict */
+                background-color: rgba(76, 201, 240, 0.15);
+                color: #0891b2; /* A shade of cyan */
+                border: 1px solid rgba(76, 201, 240, 0.3);
+            }
+
+            .status.pending-status {
+                /* Renamed to avoid conflict */
+                background-color: rgba(248, 150, 30, 0.15);
+                color: #d97706; /* A shade of orange */
+                border: 1px solid rgba(248, 150, 30, 0.3);
+            }
+
+            .status.cancelled-status {
+                /* Renamed to avoid conflict */
+                background-color: rgba(247, 37, 133, 0.15);
+                color: #db2777; /* A shade of pink-red */
+                border: 1px solid rgba(247, 37, 133, 0.3);
+            }
+
+            /* Buttons */
+            .btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                padding: 10px 20px;
+                border-radius: var(--radius);
+                font-weight: 500;
+                cursor: pointer;
+                transition: var(--transition);
+                border: none;
+                outline: none;
+                font-size: 14px;
+                letter-spacing: 0.3px;
+                box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .btn::after {
+                content: "";
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                top: 0;
+                left: -100%;
+                background: linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.2),
+                    transparent
+                );
+                transition: 0.5s;
+            }
+
+            .btn:hover::after {
+                left: 100%;
+            }
+
+            .btn i {
+                margin-right: 8px;
+                font-size: 16px;
+                transition: var(--transition);
+            }
+
+            .btn:hover i {
+                transform: translateX(2px);
+            }
+
+            .btn-primary {
+                background: linear-gradient(
+                    135deg,
+                    #4361ee,
+                    #4895ef
+                ); /* Match Apply Filters button in image */
+                color: white;
+                box-shadow: 0 4px 10px rgba(67, 97, 238, 0.3);
+            }
+
+            .btn-primary:hover {
+                background: linear-gradient(135deg, #4895ef, #4361ee);
+                transform: translateY(-2px);
+                box-shadow: 0 6px 15px rgba(67, 97, 238, 0.4);
+            }
+
+            .btn-outline {
+                border: 1px solid var(--border-color);
+                color: var(--text-light-color);
+                background-color: transparent;
+                box-shadow: none; /* remove shadow for outline */
+            }
+
+            .btn-outline:hover {
+                background-color: rgba(67, 97, 238, 0.05);
+                color: var(--primary);
+                border-color: var(--primary);
+                transform: translateY(-2px);
+            }
+
+            .btn-sm {
+                padding: 7px 14px;
+                font-size: 13px;
+                border-radius: var(--radius-sm);
+            }
+
+            .btn-view {
+                background-color: rgba(67, 97, 238, 0.1);
+                color: var(--primary);
+                border: 1px solid rgba(67, 97, 238, 0.2);
+                padding: 6px 14px; /* Reduced view button size */
+                border-radius: var(--radius-sm);
+                font-size: 12px; /* Smaller view button font */
+                font-weight: 500;
+                transition: var(--transition);
+            }
+            .btn-view:hover {
+                background-color: var(--primary);
+                color: var(--white);
+                box-shadow: 0 4px 8px rgba(58, 12, 163, 0.2);
+            }
+            .btn-view i {
+                margin-right: 4px;
+            }
+
+            /* Placeholder Content Style */
+            .placeholder-content {
+                background-color: var(--white);
+                padding: 40px;
+                border-radius: var(--radius);
+                box-shadow: var(--shadow-sm);
+                border: 1px solid var(--border-color);
+                text-align: center;
+                margin-top: 30px;
+                opacity: 0;
+                transform: translateY(10px);
+                animation: fadeIn 0.5s forwards;
+            }
+
+            @keyframes fadeIn {
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .placeholder-content h3 {
+                color: var(--secondary);
+                margin-bottom: 10px;
+            }
+            .placeholder-content p {
+                color: var(--text-light-color);
+                font-size: 16px;
+            }
+
+            /* Loader Style */
+            .loader {
+                border: 4px solid #f3f3f3; /* Light grey */
+                border-top: 4px solid var(--primary-light); /* Blue */
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                animation: spin 1s linear infinite;
+                margin: 40px auto;
+            }
+
+            @keyframes spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+
+            /* --- Media Queries --- */
+            @media (max-width: 1200px) {
+                .stats-cards {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+            }
+
+            @media (max-width: 992px) {
+                .content-wrapper {
+                    margin-left: 0;
+                }
+
+                .search-bar {
+                    flex: 1; /* Search bar takes available space */
+                    max-width: 300px;
+                    margin-left: 20px; /* Add some space next to toggle */
+                }
+            }
+
+            @media (max-width: 768px) {
+                .main-content {
+                    padding: 20px;
+                }
+
+                .page-header {
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+                .page-header h2 {
+                    font-size: 28px;
+                    margin-bottom: 15px; /* Spacing between title and controls */
+                }
+
+                .user-role {
+                    display: none;
+                }
+                .user-profile {
+                    padding: 8px;
+                }
+                .user-info {
+                    display: none;
+                }
+                .profile-img {
+                    margin-right: 0;
+                }
+                .search-bar {
+                    display: none; /* Hide search bar on smaller mobile */
+                }
+                .header {
+                    padding: 0 15px;
+                }
+                .icon-action {
+                    margin: 0 5px;
+                }
+                .filter-controls {
+                    width: 100%;
+                    justify-content: space-between;
+                }
+                .date-input-wrapper {
+                    flex-grow: 1; /* Allow date input to take more space */
+                }
+                .date-input {
+                    width: 100%; /* Full width on smaller screens */
+                }
+
+                /* Reduce padding for small tables on mobile */
+                .data-table th,
+                .data-table td {
+                    padding: 10px 15px;
+                }
+            }
+
+            @media (max-width: 576px) {
+                .filter-controls {
+                    flex-direction: column;
+                    gap: 10px;
+                }
+                .date-input-wrapper,
+                .date-input,
+                .btn-primary {
+                    width: 100%;
+                }
+
+                .stats-cards {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            /* Overlay for mobile navigation */
+            .overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 999;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.3s;
+            }
+            .overlay.active {
+                opacity: 1;
+                pointer-events: auto;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div id="sidebar" class="sidebar">
+                <div class="logo">
+                    <h1>Admin<span>Panel</span></h1>
+                </div>
+                <div class="nav-menu">
+                    <div class="menu-heading">Main</div>
+                    <div class="nav-item active" data-page="Dashboard">
+                        <i class="fas fa-chart-pie"></i>
+                        <span>Dashboard</span>
+                    </div>
+                    <div class="nav-item" data-page="Users">
+                        <i class="fas fa-users"></i>
+                        <span>Users</span>
+                    </div>
+                    <div class="nav-item" data-page="Products">
+                        <i class="fas fa-box"></i>
+                        <span>Products</span>
+                    </div>
+                    <div class="nav-item" data-page="Orders">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Orders</span>
+                    </div>
+
+                    <div class="menu-heading">Reports</div>
+                    <div class="nav-item" data-page="Analytics">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Analytics</span>
+                    </div>
+                    <div class="nav-item" data-page="Sales">
+                        <i class="fas fa-coins"></i>
+                        <span>Sales</span>
+                    </div>
+
+                    <div class="menu-heading">Admin</div>
+                    <div class="nav-item" data-page="Settings">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </div>
+                    <div class="nav-item" data-page="Notifications">
+                        <i class="fas fa-bell"></i>
+                        <span>Notifications</span>
+                    </div>
+                    <div class="nav-item" data-page="Security">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Security</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-wrapper">
+                <div class="header">
+                    <div id="menu-toggle" class="menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </div>
+
+                    <div class="search-bar">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Search..." />
+                    </div>
+                    <div class="header-actions">
+                        <div class="icon-action">
+                            <i class="fas fa-bell"></i>
+                            <div class="badge">3</div>
+                        </div>
+
+                        <div class="user-profile">
+                            <div class="profile-img">JD</div>
+                            <div class="user-info">
+                                <div class="user-name">John Doe</div>
+                                <div class="user-role">Administrator</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="main-content">
+                    <!-- Main Page Content is injected here -->
+                    <div id="page-content-container">
+                        <!-- Initial Dashboard content will be loaded here by JavaScript -->
+                        <div class="loader"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="mobile-overlay" class="overlay"></div>
+        </div>
+
+        <script type="module">
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+            import {
+                getAuth,
+                signInAnonymously,
+                signInWithCustomToken,
+            } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+            import {
+                getFirestore,
+                collection,
+                doc,
+                setDoc,
+                query,
+                onSnapshot,
+                getDocs,
+            } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+            import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+            // --- MANDATORY FIREBASE GLOBALS ---
+            const appId =
+                typeof __app_id !== "undefined" ? __app_id : "default-app-id";
+            const firebaseConfig = JSON.parse(
+                typeof __firebase_config !== "undefined"
+                    ? __firebase_config
+                    : "{}"
+            );
+            const initialAuthToken =
+                typeof __initial_auth_token !== "undefined"
+                    ? __initial_auth_token
+                    : null;
+
+            // Initialize Firebase services
+            const app = initializeApp(firebaseConfig);
+            const db = getFirestore(app);
+            const auth = getAuth(app);
+            setLogLevel("Debug");
+
+            let currentUserId = null;
+            let isAuthReady = false;
+
+            // Public collection path for users
+            const getUsersCollectionPath = () =>
+                `artifacts/${appId}/public/data/users`;
+
+            /**
+             * Renders the user table body from the provided list of users.
+             * @param {Array<Object>} users
+             * @returns {string} HTML string for the table body.
+             */
+            const renderUsersTable = (users) => {
+                if (users.length === 0) {
+                    return `
+                <tr>
+                    <td colspan="5" class="placeholder-content" style="text-align: center; padding: 30px;">
+                        <i class="fas fa-exclamation-circle" style="font-size: 30px; color: var(--warning); margin-bottom: 10px;"></i>
+                        <h3>No Users Found</h3>
+                        <p>The database is currently empty. Click 'Add User' to populate it.</p>
+                    </td>
+                </tr>
+            `;
+                }
+
+                return users
+                    .map((user) => {
+                        const dateJoined = user.joinedDate
+                            ? new Date(user.joinedDate).toLocaleDateString()
+                            : "N/A";
+                        const statusClass =
+                            user.status === "active"
+                                ? "active-status"
+                                : "pending-status";
+                        const initials = user.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")
+                            .toUpperCase();
+
+                        // Generate a simple, consistent color based on initials/name for the profile circle
+                        const stringToHslColor = (str, s, l) => {
+                            let hash = 0;
+                            for (let i = 0; i < str.length; i++) {
+                                hash = str.charCodeAt(i) + ((hash << 5) - hash);
+                            }
+                            const h = hash % 360;
+                            return `hsl(${h}, ${s}%, ${l}%)`;
+                        };
+                        const profileColor = stringToHslColor(
+                            user.name,
+                            65,
+                            50
+                        );
+
+                        return `
+                <tr>
+                    <td class="col-id">${user.id.substring(0, 7)}...</td>
+                    <td class="col-name">
+                        <div style="display: flex; align-items: center;">
+                            <div class="profile-img" style="width: 32px; height: 32px; font-size: 13px; margin-right: 12px; background: ${
+                                user.color || profileColor
+                            }; box-shadow: none;">${initials}</div>
+                            ${user.name}
+                        </div>
+                    </td>
+                    <td class="col-contact">${user.phone}</td>
+                    <td>${dateJoined}</td>
+                    <td class="col-status">
+                        <span class="status ${statusClass}">
+                            <i class="fas ${
+                                user.status === "active"
+                                    ? "fa-check-circle"
+                                    : "fa-clock"
+                            }"></i>
+                            ${user.status}
+                        </span>
+                    </td>
+                    <td class="col-actions">
+                        <button class="btn-view">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                    </td>
+                </tr>
+            `;
+                    })
+                    .join("");
+            };
+
+            /**
+             * The main function to handle the Users page content.
+             * Sets up the table structure and attaches the real-time listener.
+             */
+            const loadUsersPage = async (container) => {
+                if (!isAuthReady) {
+                    container.innerHTML = `<div class="placeholder-content"><h3><i class="fas fa-lock" style="color: var(--danger); margin-right: 10px;"></i>Authentication Required</h3><p>Please wait while the system authenticates...</p><div class="loader"></div></div>`;
+                    return;
+                }
+
+                // Initial structure of the Users page (Header and empty table container)
+                container.innerHTML = `
+              <div class="page-header">
+                  <h2 id="page-title">Users Management</h2>
+                  <!-- Add user button is moved to the table card header -->
+              </div>
+              <div class="table-card">
+                  <div class="card-title">
+                      <h3>Application Users</h3>
+                      <button class="btn btn-primary btn-sm" onclick="alert('Add User form would open here.')">
+                          <i class="fas fa-user-plus"></i> Add New User
+                      </button>
+                  </div>
+                  <div class="table-container">
+                      <table class="data-table">
+                          <thead>
+                              <tr>
+                                  <th class="col-id">User ID</th>
+                                  <th class="col-name">Name</th>
+                                  <th class="col-contact">Phone Number</th>
+                                  <th>Joined Date</th>
+                                  <th class="col-status">Status</th>
+                                  <th class="col-actions">Actions</th>
+                              </tr>
+                          </thead>
+                          <tbody id="users-table-body">
+                              <tr><td colspan="6"><div class="loader"></div></td></tr>
+                          </tbody>
+                      </table>
+                  </div>
+              </div>
+          `;
+
+                const tableBody = document.getElementById("users-table-body");
+                if (!tableBody) return;
+
+                // Attach real-time listener
+                const usersRef = collection(db, getUsersCollectionPath());
+                const q = query(usersRef);
+
+                // Seed data check: get first to see if collection is empty
+                const snapshot = await getDocs(usersRef);
+                if (snapshot.empty) {
+                    await seedDummyUsers();
+                }
+
+                const unsubscribe = onSnapshot(
+                    q,
+                    (querySnapshot) => {
+                        const users = [];
+                        querySnapshot.forEach((doc) => {
+                            users.push({ id: doc.id, ...doc.data() });
+                        });
+
+                        tableBody.innerHTML = renderUsersTable(users);
+                    },
+                    (error) => {
+                        console.error("Firestore snapshot error:", error);
+                        tableBody.innerHTML = `<tr><td colspan="6" style="color: var(--danger); text-align: center; padding: 20px;">Error loading users: ${error.message}</td></tr>`;
+                    }
+                );
+
+                // In a real application, you would store and use the 'unsubscribe' function
+                // to stop listening when the component unmounts (i.e., when you navigate away).
+                // For this single-file setup, we'll let it persist.
+            };
+
+            /**
+             * Seeds the Firestore 'users' collection with initial data if it's empty.
+             */
+            const seedDummyUsers = async () => {
+                const userList = [
+                    {
+                        name: "Eleanor Vance",
+                        phone: "(555) 123-4567",
+                        status: "active",
+                        joinedDate: Date.now(),
+                        color: "#e63946",
+                    },
+                    {
+                        name: "Michael Chen",
+                        phone: "(555) 987-6543",
+                        status: "active",
+                        joinedDate: Date.now() - 86400000 * 5,
+                        color: "#f77f00",
+                    },
+                    {
+                        name: "Sarah Kim",
+                        phone: "(555) 555-0101",
+                        status: "pending",
+                        joinedDate: Date.now() - 86400000 * 10,
+                        color: "#4cc9f0",
+                    },
+                    {
+                        name: "David Rodriguez",
+                        phone: "(555) 300-8800",
+                        status: "active",
+                        joinedDate: Date.now() - 86400000 * 2,
+                        color: "#a4133b",
+                    },
+                ];
+
+                const batch = [];
+                userList.forEach((user) => {
+                    const newDocRef = doc(
+                        collection(db, getUsersCollectionPath())
+                    );
+                    batch.push(setDoc(newDocRef, user));
+                });
+
+                try {
+                    await Promise.all(batch);
+                    console.log("Dummy user data seeded successfully.");
+                } catch (e) {
+                    console.error("Error seeding dummy data: ", e);
+                }
+            };
+
+            // --- Core Navigation and Content Loading Functions ---
+
+            /**
+             * Defines the full HTML content for the default Dashboard view.
+             */
+            const dashboardContent = `
+        <div class="page-header">
+          <h2 id="page-title">Dashboard</h2>
+          <div class="filter-controls">
+            <div class="date-input-wrapper">
+              <input type="text" class="date-input" value="October 15, 2024" readonly />
+              <i class="fas fa-caret-down dropdown-icon"></i>
+            </div>
+            <button class="btn btn-primary">Apply Filters</button>
+          </div>
+        </div>
+        
+        <div class="stats-cards">
+          <div class="stat-card blue-border">
+            <div class="card-top">
+              <div>
+                <div class="card-value">1,504</div>
+                <div class="card-label">Active Menu Items</div>
+              </div>
+              <div class="card-icon blue-gradient">
+                <i class="fas fa-utensils"></i>
+              </div>
+            </div>
+            <div class="card-bottom-text blue-light">
+              <i class="fas fa-plus"></i> 30 New Additions
+            </div>
+          </div>
+          <div class="stat-card purple-border">
+            <div class="card-top">
+              <div>
+                <div class="card-value">12,500</div>
+                <div class="card-label">Total Orders</div>
+              </div>
+              <div class="card-icon purple-gradient">
+                <i class="fas fa-clipboard-list"></i>
+              </div>
+            </div>
+            <div class="card-bottom-text purple-light">
+              75% Completed
+            </div>
+          </div>
+          <div class="stat-card green-border">
+            <div class="card-top">
+              <div>
+                <div class="card-value">$3,250.00</div>
+                <div class="card-label">Monthly Revenue</div>
+              </div>
+              <div class="card-icon green-gradient">
+                <i class="fas fa-dollar-sign"></i>
+              </div>
+            </div>
+            <div class="card-bottom-text green-light">
+              <i class="fas fa-arrow-up"></i> +8.2% vs Last Month
+            </div>
+          </div>
+          <div class="stat-card orange-border">
+            <div class="card-top">
+              <div>
+                <div class="card-value">$42,500</div>
+                <div class="card-label">Net Profit</div>
+              </div>
+              <div class="card-icon orange-gradient">
+                <i class="fas fa-chart-line"></i>
+              </div>
+            </div>
+            <div class="card-bottom-text orange-light">
+              <i class="fas fa-arrow-up"></i> +5.2% Growth Rate
+            </div>
+          </div>
+        </div>
+        
+        <div class="table-card">
+          <div class="card-title">
+            <h3>Recent Orders</h3>
+            <button class="btn btn-outline btn-sm">
+              <i class="fas fa-eye"></i> View All
+            </button>
+          </div>
+          <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>#ORD-001</td>
+                    <td>John Smith</td>
+                    <td>15 Mar 2025</td>
+                    <td>$125.00</td>
+                    <td>
+                      <span class="status active-status"
+                        ><i class="fas fa-check-circle"></i> Completed</span
+                      >
+                    </td>
+                    <td>
+                      <button class="btn-view">
+                        <i class="fas fa-eye"></i> View
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>#ORD-002</td>
+                    <td>Emma Johnson</td>
+                    <td>14 Mar 2025</td>
+                    <td>$245.99</td>
+                    <td>
+                      <span class="status pending-status"
+                        ><i class="fas fa-clock"></i> Pending</span
+                      >
+                    </td>
+                    <td>
+                      <button class="btn-view">
+                        <i class="fas fa-eye"></i> View
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>#ORD-003</td>
+                    <td>Michael Brown</td>
+                    <td>13 Mar 2025</td>
+                    <td>$79.50</td>
+                    <td>
+                      <span class="status active-status"
+                        ><i class="fas fa-check-circle"></i> Completed</span
+                      >
+                    </td>
+                    <td>
+                      <button class="btn-view">
+                        <i class="fas fa-eye"></i> View
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>#ORD-004</td>
+                    <td>Sarah Davis</td>
+                    <td>12 Mar 2025</td>
+                    <td>$350.00</td>
+                    <td>
+                      <span class="status cancelled-status"
+                        ><i class="fas fa-times-circle"></i> Cancelled</span
+                      >
+                    </td>
+                    <td>
+                      <button class="btn-view">
+                        <i class="fas fa-eye"></i> View
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>#ORD-005</td>
+                    <td>David Wilson</td>
+                    <td>11 Mar 2025</td>
+                    <td>$185.25</td>
+                    <td>
+                      <span class="status active-status"
+                        ><i class="fas fa-check-circle"></i> Completed</span
+                      >
+                    </td>
+                    <td>
+                      <button class="btn-view">
+                        <i class="fas fa-eye"></i> View
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+          </div>
+        </div>
+      `;
+
+            /**
+             * Generates placeholder content for non-Dashboard pages.
+             * @param {string} pageName The name of the page to load.
+             * @returns {string} The HTML content string.
+             */
+            const createPlaceholderContent = (pageName) => {
+                const iconMap = {
+                    Products: "fas fa-box",
+                    Orders: "fas fa-shopping-cart",
+                    Analytics: "fas fa-chart-line",
+                    Sales: "fas fa-coins",
+                    Settings: "fas fa-cog",
+                    Notifications: "fas fa-bell",
+                    Security: "fas fa-shield-alt",
+                };
+                const iconClass = iconMap[pageName] || "fas fa-info-circle";
+
+                return `
+          <div class="page-header">
+            <h2 id="page-title">${pageName}</h2>
+            <!-- Filter controls are omitted on most views for simplicity -->
+          </div>
+          <div class="placeholder-content">
+            <i class="${iconClass}" style="font-size: 60px; color: var(--info); margin-bottom: 20px;"></i>
+            <h3>Welcome to the ${pageName} Page</h3>
+            <p>This is where the main content for managing ${pageName.toLowerCase()} will live.</p>
+            <p style="margin-top: 20px;">We can build out tables, forms, or charts here to create a fully functional ${pageName} view!</p>
+            <button class="btn btn-primary" style="margin-top: 30px;">
+                <i class="fas fa-plus"></i> Add New ${
+                    pageName.slice(0, -1) || pageName
+                }
+            </button>
+          </div>
+        `;
+            };
+
+            /**
+             * Loads the correct content based on the clicked menu item.
+             * @param {string} pageName The name of the page to load.
+             */
+            const loadPageContent = async (pageName) => {
+                const container = document.getElementById(
+                    "page-content-container"
+                );
+                if (!container) return;
+
+                // 1. Apply fade out effect
+                container.style.opacity = "0";
+                container.style.transform = "translateY(10px)";
+
+                // 2. Wait for a moment, change content, and fade back in
+                setTimeout(async () => {
+                    if (pageName === "Dashboard") {
+                        container.innerHTML = dashboardContent;
+                    } else if (pageName === "Users") {
+                        await loadUsersPage(container); // Call the new async function
+                    } else {
+                        container.innerHTML =
+                            createPlaceholderContent(pageName);
+                    }
+
+                    container.style.opacity = "1";
+                    container.style.transform = "translateY(0)";
+                }, 150); // Small delay to show the transition effect
+            };
+
+            // --- Event Listeners and Initialization ---
+
+            document.addEventListener("DOMContentLoaded", async () => {
+                const sidebar = document.getElementById("sidebar");
+                const menuToggle = document.getElementById("menu-toggle");
+                const overlay = document.getElementById("mobile-overlay");
+                const navItems = document.querySelectorAll(".nav-item");
+
+                // --- Firebase Authentication ---
+                try {
+                    if (initialAuthToken) {
+                        await signInWithCustomToken(auth, initialAuthToken);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                    currentUserId = auth.currentUser?.uid || "anonymous";
+                    isAuthReady = true;
+                    console.log("Firebase Auth Ready. User ID:", currentUserId);
+
+                    // --- Initial Content Load ---
+                    // Load Dashboard content when the page first opens
+                    loadPageContent("Dashboard");
+                } catch (error) {
+                    console.error("Firebase Auth Error:", error);
+                    isAuthReady = true; // Still mark as ready to prevent infinite loading, even if failed
+                    // Fallback content in case of auth failure
+                    document.getElementById(
+                        "page-content-container"
+                    ).innerHTML = `<div class="placeholder-content"><h3 style="color: var(--danger);">Authentication Failed</h3><p>${error.message}</p></div>`;
+                }
+
+                // Function to toggle the sidebar
+                const toggleSidebar = () => {
+                    sidebar.classList.toggle("active");
+                    overlay.classList.toggle("active");
+                };
+
+                /**
+                 * Handles the sidebar click, updating active state and loading content.
+                 * @param {HTMLElement} item The clicked navigation item element.
+                 */
+                const handleNavigation = (item) => {
+                    const pageName = item.getAttribute("data-page");
+
+                    // 1. Update Active State
+                    navItems.forEach((i) => i.classList.remove("active"));
+                    item.classList.add("active");
+
+                    // 2. Load the dynamic content
+                    loadPageContent(pageName);
+
+                    // On mobile, close the sidebar after an item is clicked
+                    if (window.innerWidth <= 992) {
+                        toggleSidebar();
+                    }
+                };
+
+                // --- Sidebar Toggle Logic ---
+                if (menuToggle && sidebar && overlay) {
+                    menuToggle.addEventListener("click", toggleSidebar);
+                    overlay.addEventListener("click", toggleSidebar);
+                }
+
+                // --- Navigation Listener ---
+                navItems.forEach((item) => {
+                    item.addEventListener("click", (e) => {
+                        e.preventDefault();
+                        handleNavigation(item);
+                    });
+                });
+
+                // --- Resize Listener for Desktop View ---
+                window.addEventListener("resize", () => {
+                    if (window.innerWidth > 992) {
+                        // Ensure mobile classes are removed if user resizes to desktop view
+                        sidebar.classList.remove("active");
+                        overlay.classList.remove("active");
+                    }
+                });
+            });
+        </script>
+    </body>
+</html>
